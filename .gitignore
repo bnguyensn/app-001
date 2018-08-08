@@ -1,0 +1,69 @@
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ########## GENERAL ########## #
+
+# IntelliJ
+.idea
+*.iml
+out
+gen
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Logs
+logs
+*.log
+
+# ########## OS ########## #
+
+# macOS
+.DS_store
+
+# ########## PACKAGES ########## #
+
+# https://docs.npmjs.com/cli/shrinkwrap#caveats
+node_modules
+
+# dotenv
+.env
+
+# webpack
+stats.json
+
+# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# ########## MISC. ########## #
+
+# dist folder
+dist
+
+# data
+/server/db/mysql-cfg.json
+
+# tests
+tests/no-commit
+server/tests/no-commit

@@ -1,0 +1,95 @@
+{
+  "extends": [
+    "airbnb"
+    /*"plugin:flowtype/recommended",*/
+  ],
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest": true,
+    "es6": true,
+    "mongo": true
+  },
+  "plugins": [
+    /*"flowtype",*/
+    "jsx-a11y"
+  ],
+  "globals": {
+    //        "VERSION": true,
+    //        "$PropertyType": true
+  },
+  "rules": {
+    "arrow-body-style": [
+      "warn",
+      "as-needed"
+    ],
+    "indent": [
+      "error",
+      4
+    ],
+    "jsx-a11y/anchor-is-valid": [
+      "error",
+      {
+        "aspects": [
+          "invalidHref"
+        ]
+      }
+    ],
+    "linebreak-style": 0,
+    "lines-between-class-members": 0,
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ],
+    "no-unused-vars": 0,
+    "spaced-comment": 0,
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "log",
+          "error"
+        ]
+      }
+    ],
+    "no-plusplus": [
+      "error",
+      {
+        "allowForLoopAfterthoughts": true
+      }
+    ],
+    "object-curly-spacing": "off",
+    "one-var": [
+      "error",
+      {
+        "initialized": "never",
+        "uninitialized": "always"
+      }
+    ],
+    "react/jsx-filename-extension": 0,
+    "react/jsx-indent": [
+      true,
+      4
+    ],
+    "react/no-multi-comp": 0,
+    "react/jsx-one-expression-per-line": false,
+    "react/prop-types": 0,
+    "react/require-default-props": 0,
+    "react/sort-comp": [
+      1,
+      {
+        "order": [
+          "type-annotations",
+          "static-methods",
+          "lifecycle",
+          "everything-else",
+          "render"
+        ]
+      }
+    ],
+    "semi": "off"
+  }
+}
