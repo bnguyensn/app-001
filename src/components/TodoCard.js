@@ -1,24 +1,22 @@
 import * as React from 'react';
-import TodoList from './TodoList';
+import TodoListItem from './TodoListItem';
+
+function NoListItem() {
+    return (
+        <div>There doesn&#39;t seem to be anything here.</div>
+    )
+}
 
 export default class TodoCard extends React.PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            title: '',
-            todos: [],
-        };
-    }
-
     render() {
-        const {title, todos} = this.state;
+        const {todo} = this.props;
+        const {id, title, list, done} = todo;
+        const listItems = list.map(listItem => <TodoListItem key={listItem.id} listItem={listItem} />);
 
         return (
             <div className="todo-card-container">
-                <section className="todo-card-title">
-                    <span>{title}</span>
-                </section>
-                <TodoList todos={todos} />
+                <section className="todo-card-title">{title}</section>
+                {listItems.length > 0 ? listItems : <NoListItem />}
             </div>
         )
     }

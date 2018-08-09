@@ -1,0 +1,27 @@
+{
+  "username": "test-001",
+  "todos": [
+    {
+      "id": 1,
+      "title": "Groceries",
+      "list": [
+        {
+          "id": 1,
+          "description": "Apple",
+          "done": true
+        },
+        {
+          "id": 2,
+          "description": "Banana",
+          "done": false
+        },
+        {
+          "id": 3,
+          "description": "Coconut",
+          "done": false
+        }
+      ],
+      "done": false
+    }
+  ]
+}

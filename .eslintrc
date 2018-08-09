@@ -38,6 +38,10 @@
     ],
     "linebreak-style": 0,
     "lines-between-class-members": 0,
+    "max-len": [
+      "error",
+      120
+    ],
     "no-param-reassign": [
       "error",
       {
@@ -45,7 +49,6 @@
       }
     ],
     "no-unused-vars": 0,
-    "spaced-comment": 0,
     "no-console": [
       "error",
       {
@@ -55,12 +58,20 @@
         ]
       }
     ],
+    "no-multi-spaces": [
+      "error",
+      {
+        "ignoreEOLComments": true
+      }
+    ],
     "no-plusplus": [
       "error",
       {
         "allowForLoopAfterthoughts": true
       }
     ],
+    "no-trailing-spaces": "off",
+    "object-curly-newline": "off",
     "object-curly-spacing": "off",
     "one-var": [
       "error",
@@ -90,6 +101,7 @@
         ]
       }
     ],
-    "semi": "off"
+    "semi": "off",
+    "spaced-comment": 0
   }
 }
