@@ -24,10 +24,7 @@
       "warn",
       "as-needed"
     ],
-    "indent": [
-      "error",
-      4
-    ],
+    "indent": "off",
     "jsx-a11y/anchor-is-valid": [
       "error",
       {
@@ -86,6 +83,10 @@
       4
     ],
     "react/no-multi-comp": 0,
+    "react/jsx-closing-bracket-location": false,
+    "react/jsx-first-prop-new-line": false,
+    "react/jsx-max-props-per-line": false,
+    "react/jsx-indent-props": false,
     "react/jsx-one-expression-per-line": false,
     "react/prop-types": 0,
     "react/require-default-props": 0,

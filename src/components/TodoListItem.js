@@ -2,14 +2,16 @@ import * as React from 'react';
 
 export default class TodoListItem extends React.PureComponent {
     render() {
-        const {listItem} = this.props;
+        const {listItem, updateTodo} = this.props;
         const {description, done} = listItem;
 
         return (
-            <div className="todo-list-item-container">
-                <input className="todo-list-item-checkbox" type="checkbox" checked={done} />
+            <li className="todo-list-item">
+                <input className="todo-list-item-checkbox"
+                       type="checkbox" checked={done} name={description}
+                       onChange={updateTodo} />
                 <div className="todo-list-item-description" contentEditable>{description}</div>
-            </div>
+            </li>
         )
     }
 }

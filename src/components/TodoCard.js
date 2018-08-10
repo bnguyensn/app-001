@@ -9,14 +9,16 @@ function NoListItem() {
 
 export default class TodoCard extends React.PureComponent {
     render() {
-        const {todo} = this.props;
+        const {todo, updateTodo} = this.props;
         const {id, title, list, done} = todo;
-        const listItems = list.map(listItem => <TodoListItem key={listItem.id} listItem={listItem} />);
+        const listItems = list.map(listItem => (
+            <TodoListItem key={listItem.id} listItem={listItem} updateTodo={updateTodo} />
+        ));
 
         return (
             <div className="todo-card-container">
                 <section className="todo-card-title">{title}</section>
-                {listItems.length > 0 ? listItems : <NoListItem />}
+                <ul className="todo-list-items">{listItems.length > 0 ? listItems : <NoListItem />}</ul>
             </div>
         )
     }
