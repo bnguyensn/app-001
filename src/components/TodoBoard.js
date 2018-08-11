@@ -12,35 +12,28 @@ function EmptyBoard() {
 }
 
 export default class TodoBoard extends React.PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: '',
-            todos: [],
-        };
-    }
-
     async componentDidMount() {
         const userData = await getTodos();
-        this.setState({
-            username: userData.username,
-            todos: userData.todos,  // todos is an array of objects
-        });
+        this.username = userData.username;
+        this.todos = userData.todos;
+        this.forceUpdate();
     }
 
-    updateTodo = (e) => {
-        console.log(`Update todo #${e.currentTarget.name}`);
-    };
-
     render() {
-        const {username, todos} = this.state;
-        const todoCards = todos.length > 0
-            ? todos.map(todo => <TodoCard key={todo.id} todo={todo} updateTodo={this.updateTodo} />)
+        const todoEntries = this.todos !== undefined ? Object.entries(this.todos) : [];
+
+        const todoCards = todoEntries.length > 0
+            ? todoEntries.map((todoEntry) => {
+                const entryId = todoEntry[0];
+                const entryData = todoEntry[1];
+
+                return <TodoCard key={entryId} todoId={entryId} todo={entryData} />
+            })
             : [];
 
         return (
             <div className="todo-board-container">
-                <div className="todo-board-title">{`${username}'s to-do tracker`}</div>
+                <div className="todo-board-title">{`${this.username}'s to-do tracker`}</div>
                 <TodoCreateNew />
                 <div className="todo-cards-container">
                     {todoCards.length > 0

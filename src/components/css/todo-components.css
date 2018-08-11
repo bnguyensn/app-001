@@ -21,7 +21,11 @@
     display: flex;
     flex-direction: column;
 
-    max-width: 30rem;
+    width: 25rem;
+    border: 1px solid #757575;
+    padding: .5rem 0;
+
+    box-shadow: 0 4px 8px #757575;
 }
 
 .todo-card-title {
@@ -29,18 +33,44 @@
 }
 
 .todo-list-items {
-    list-style: none;
     padding: 0;
+    list-style: none;
+    text-align: left;
 }
 
 .todo-list-item {
+    display: flex;
+    align-items: flex-start;
+
     margin: 0;
+    padding: .5rem;
+}
+
+.todo-list-item:focus-within {
+    outline: 1px solid #9E9E9E;
 }
 
 .todo-list-item-checkbox {
     display: inline-block;
+    margin-right: 1rem;
 }
 
 .todo-list-item-description {
     display: inline-block;
+    flex-grow: 1;
+
+    white-space: pre-wrap;
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.todo-list-item-description:focus {
+    outline: none;
+}
+
+.todo-list-item-description:empty:before {
+    content: attr(placeholder);
+    color: #9E9E9E;
+    cursor: text;
 }

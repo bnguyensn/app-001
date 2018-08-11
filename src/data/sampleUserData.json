@@ -1,27 +1,23 @@
 {
   "username": "Alex Jones",
-  "todos": [
-    {
-      "id": 1,
+  "todos": {
+    "todo1": {
       "title": "Groceries",
-      "list": [
-        {
-          "id": 1,
+      "list": {
+        "todo1-item1": {
           "description": "Apple",
           "done": true
         },
-        {
-          "id": 2,
+        "todo1-item2": {
           "description": "Banana",
           "done": false
         },
-        {
-          "id": 3,
+        "todo1-item3": {
           "description": "Coconut",
           "done": false
         }
-      ],
+      },
       "done": false
     }
-  ]
+  }
 }
