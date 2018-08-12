@@ -2,8 +2,8 @@ import * as React from 'react';
 import TodoCreateNew from './TodoCreateNew';
 import TodoCard from './TodoCard';
 import './css/todo-components.css';
-
-import getTodos from '../utils/getTodos';
+import initData from '../api/init';
+import {readUsername, readTodos} from '../api/read';
 
 function EmptyBoard() {
     return (
@@ -13,9 +13,9 @@ function EmptyBoard() {
 
 export default class TodoBoard extends React.PureComponent {
     async componentDidMount() {
-        const userData = await getTodos();
-        this.username = userData.username;
-        this.todos = userData.todos;
+        await initData();
+        this.username = readUsername();
+        this.todos = readTodos();
         this.forceUpdate();
     }
 
