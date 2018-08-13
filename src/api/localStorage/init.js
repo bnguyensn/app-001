@@ -1,6 +1,6 @@
 export default async function initData() {
     if (localStorage.length === 0) {
-        const sampleData = await import('../data/sampleUserData.json');
+        const sampleData = await import('../../data/sampleUserData.json');
         try {
             // First time initialising data
             localStorage.setItem('username', sampleData.username);

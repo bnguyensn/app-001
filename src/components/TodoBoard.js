@@ -2,8 +2,8 @@ import * as React from 'react';
 import TodoCreateNew from './TodoCreateNew';
 import TodoCard from './TodoCard';
 import './css/todo-components.css';
-import initData from '../api/init';
-import {readUsername, readTodos} from '../api/read';
+import initData from '../api/localStorage/init';
+import {readUsername, readTodos} from '../api/localStorage/read';
 
 function EmptyBoard() {
     return (
