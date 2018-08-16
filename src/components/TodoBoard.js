@@ -2,8 +2,9 @@ import * as React from 'react';
 import TodoCreateNew from './TodoCreateNew';
 import TodoCard from './TodoCard';
 import './css/todo-components.css';
-import initData from '../api/localStorage/init';
-import {readUsername, readTodos} from '../api/localStorage/read';
+import connectIDB from '../api/indexedDB/connectIDB';
+import deleteIDB from '../api/indexedDB/deleteIDB';
+import {getTodo} from '../api/indexedDB/readIDB';
 
 function EmptyBoard() {
     return (
@@ -12,14 +13,62 @@ function EmptyBoard() {
 }
 
 export default class TodoBoard extends React.PureComponent {
-    async componentDidMount() {
-        await initData();
-        this.username = readUsername();
-        this.todos = readTodos();
-        this.forceUpdate();
+    constructor(props) {
+        super(props);
+        this.state = {
+            todoId: '',
+        };
     }
 
+
+    async componentDidMount() {
+        const db = await connectIDB();
+        // this.username = readUsername();
+        // this.todos = readTodos();
+        // this.forceUpdate();
+    }
+
+    initDB = async () => {
+        const db = await connectIDB();
+    };
+
+    deleteDB = async () => {
+        await deleteIDB();
+    };
+
+    getTodo = async () => {
+        const {todoId} = this.state;
+
+        const resTodo = await getTodo(todoId);
+        if (resTodo === undefined) {
+            console.log(`Nothing found after successfully querying todoId#${todoId}.`);
+        } else {
+            console.log(`Result after successfully querying todoId#${todoId}: title=${resTodo.title}.`);
+        }
+    };
+
+    handleInputChange = (e) => {
+        this.setState({
+            [e.target.name]: e.target.value,
+        });
+    };
+
     render() {
+        const {todoId} = this.state;
+
+        return (
+            <div>
+                <button type="button" onClick={this.initDB}>CREATE</button>
+                <button type="button" onClick={this.deleteDB}>DELETE</button>
+                <button type="button" onClick={this.getTodo}>GET todoID</button>
+                <input type="text" name="todoId" placeholder="todoId"
+                       value={todoId}
+                       onChange={this.handleInputChange} />
+            </div>
+        )
+    }
+
+    /*render() {
         const todoEntries = this.todos !== undefined ? Object.entries(this.todos) : [];
 
         const todoCards = todoEntries.length > 0
@@ -43,5 +92,5 @@ export default class TodoBoard extends React.PureComponent {
                 </div>
             </div>
         )
-    }
+    }*/
 }

@@ -24,6 +24,10 @@
       "warn",
       "as-needed"
     ],
+    "block-spacing": [
+      "error",
+      "never"
+    ],
     "indent": "off",
     "jsx-a11y/anchor-is-valid": [
       "error",
@@ -61,6 +65,7 @@
         "ignoreEOLComments": true
       }
     ],
+    "no-multiple-empty-lines": "off",
     "no-plusplus": [
       "error",
       {
