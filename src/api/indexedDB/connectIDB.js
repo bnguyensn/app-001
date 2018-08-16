@@ -21,7 +21,7 @@ export default function connectIDB() {
                 const db = e.target.result;
 
                 db.onerror = (eOnUpgradeNeeded) => {
-                    reject(Error(`Error initialising database: ${eOnUpgradeNeeded.target.errorCode}`));
+                    reject(Error(`Error initialising database: ${eOnUpgradeNeeded}`));
                 };
 
                 db.oncomplete = () => {
@@ -44,13 +44,6 @@ export default function connectIDB() {
                 // Also note: both of the below db.createObjectStore() share the same transaction
                 const todosObjStore = db.createObjectStore('todos', {keyPath: 'id'});
                 const todoListItemsObjStore = db.createObjectStore('todoListItems', {autoIncrement: true});
-
-                todosObjStore.onerror = (eCreateObjStore) => {
-                    reject(Error(`Error creating todosObjStore: ${eCreateObjStore.target.errorCode}`));
-                };
-                todoListItemsObjStore.onerror = (eCreateObjStore) => {
-                    reject(Error(`Error creating todoListItemsObjStore: ${eCreateObjStore.target.errorCode}`));
-                };
 
                 // ********** Define object stores' data types **********
                 // objStore.createIndex() creates a new field / column for each database record
