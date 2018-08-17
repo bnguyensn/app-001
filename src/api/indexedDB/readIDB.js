@@ -4,7 +4,8 @@ import connectIDB from './connectIDB';
 
 /**
  * Main read query
- * @return IDBObjectStore
+ * @return Promise - Resolve: Promise contains an instance of IDBObjectStore
+ *                   Reject: Promise contains an Error object
  * */
 async function read(objStoreName, query) {
     const db = await connectIDB();
@@ -28,7 +29,10 @@ async function read(objStoreName, query) {
     })
 }
 
-// Get multiple items using index
+/**
+ * @return Promise - Resolve: Promise contains an array of items pulled from database
+ *                   Reject: Promise contains an Error object
+ * */
 async function getItemsIndex(objStoreName, indexName, indexKey) {
     const objStore = await read(objStoreName, indexName);
 
@@ -61,7 +65,10 @@ async function getItemsIndex(objStoreName, indexName, indexKey) {
     })
 }
 
-// Get one item
+/**
+ * @return Promise - Resolve: Promise contains the item pulled from database
+ *                   Reject: Promise contains an Error object
+ * */
 async function getItem(objStoreName, key) {
     const objStore = await read(objStoreName, key);
 
