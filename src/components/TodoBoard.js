@@ -4,7 +4,7 @@ import TodoCard from './TodoCard';
 import './css/todo-components.css';
 import connectIDB from '../api/indexedDB/connectIDB';
 import deleteIDB from '../api/indexedDB/deleteIDB';
-import {getTodo} from '../api/indexedDB/readIDB';
+import {getTodo, getTodoListItems} from '../api/indexedDB/readIDB';
 
 function EmptyBoard() {
     return (
@@ -43,7 +43,19 @@ export default class TodoBoard extends React.PureComponent {
         if (resTodo === undefined) {
             console.log(`Nothing found after successfully querying todoId#${todoId}.`);
         } else {
-            console.log(`Result after successfully querying todoId#${todoId}: title=${resTodo.title}.`);
+            console.log(`Result after successfully querying todoId#${todoId}: title=${JSON.stringify(resTodo)}.`);
+        }
+    };
+
+    getTodoListItems = async () => {
+        const {todoId} = this.state;
+
+        const resTodoListItems = await getTodoListItems(todoId);
+        if (resTodoListItems === undefined || resTodoListItems.length < 1) {
+            console.log(`Nothing found after successfully querying todoId#${todoId}.`);
+        } else {
+            console.log(`Result after successfully querying todoId#${todoId}
+            : title=${JSON.stringify(resTodoListItems)}.`);
         }
     };
 
@@ -60,7 +72,9 @@ export default class TodoBoard extends React.PureComponent {
             <div>
                 <button type="button" onClick={this.initDB}>CREATE</button>
                 <button type="button" onClick={this.deleteDB}>DELETE</button>
-                <button type="button" onClick={this.getTodo}>GET todoID</button>
+                <br />
+                <button type="button" onClick={this.getTodo}>GET todos</button>
+                <button type="button" onClick={this.getTodoListItems}>GET todoListItems</button>
                 <input type="text" name="todoId" placeholder="todoId"
                        value={todoId}
                        onChange={this.handleInputChange} />
