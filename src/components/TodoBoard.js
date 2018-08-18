@@ -2,9 +2,11 @@ import * as React from 'react';
 import TodoCreateNew from './TodoCreateNew';
 import TodoCard from './TodoCard';
 import './css/todo-components.css';
-import connectIDB from '../api/indexedDB/connectIDB';
+import {connectIDB} from '../api/indexedDB/connectIDB';
 import deleteIDB from '../api/indexedDB/deleteIDB';
-import {getTodo, getTodoListItems} from '../api/indexedDB/readIDB';
+import {itemExist, getTodo, getTodoListItems} from '../api/indexedDB/readIDB';
+import {addTodo} from '../api/indexedDB/addItemsIDB';
+import {removeTodo, removeTodoListItem} from '../api/indexedDB/removeItemsIDB';
 
 function EmptyBoard() {
     return (
@@ -19,7 +21,6 @@ export default class TodoBoard extends React.PureComponent {
             todoId: '',
         };
     }
-
 
     async componentDidMount() {
         const db = await connectIDB();
@@ -40,7 +41,10 @@ export default class TodoBoard extends React.PureComponent {
         const {todoId} = this.state;
 
         const resTodo = await getTodo(todoId);
-        if (resTodo === undefined) {
+
+        if (resTodo instanceof Error) {
+            console.log(`Error when querying todoId#${todoId}: ${resTodo}`);
+        } else if (resTodo === undefined) {
             console.log(`Nothing found after successfully querying todoId#${todoId}.`);
         } else {
             console.log(`Result after successfully querying todoId#${todoId}: title=${JSON.stringify(resTodo)}.`);
@@ -51,11 +55,41 @@ export default class TodoBoard extends React.PureComponent {
         const {todoId} = this.state;
 
         const resTodoListItems = await getTodoListItems(todoId);
-        if (resTodoListItems === undefined || resTodoListItems.length < 1) {
+
+        if (resTodoListItems instanceof Error) {
+            console.log(`Error when querying todoId#${todoId}: ${resTodoListItems}`);
+        } else if (resTodoListItems === undefined || resTodoListItems.length < 1) {
             console.log(`Nothing found after successfully querying todoId#${todoId}.`);
         } else {
             console.log(`Result after successfully querying todoId#${todoId}
             : title=${JSON.stringify(resTodoListItems)}.`);
+        }
+    };
+
+    addTodo = async () => {
+        const res = await addTodo();
+
+        if (res instanceof Error) {
+            console.log(`Error when adding todo: ${res}`);
+        } else {
+            console.log('Successfully added todo.');
+        }
+    };
+
+    removeTodo = async () => {
+        const {todoId} = this.state;
+        const res = await removeTodo(todoId);
+        console.log(res);
+    };
+
+    checkTodoExist = async () => {
+        const {todoId} = this.state;
+
+        try {
+            const exist = await itemExist('todos', todoId);
+            console.log(`Item exists?: ${exist}`);
+        } catch (e) {
+            console.log(`Final error: ${e}`);
         }
     };
 
@@ -78,6 +112,11 @@ export default class TodoBoard extends React.PureComponent {
                 <input type="text" name="todoId" placeholder="todoId"
                        value={todoId}
                        onChange={this.handleInputChange} />
+                <br />
+                <button type="button" onClick={this.addTodo}>ADD todos</button>
+                <button type="button" onClick={this.removeTodo}>REMOVE todos</button>
+                <br />
+                <button type="button" onClick={this.checkTodoExist}>CHECK todos exist</button>
             </div>
         )
     }

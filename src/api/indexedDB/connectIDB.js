@@ -1,4 +1,4 @@
-export default function connectIDB() {
+function connectIDB() {
     return new Promise((resolve, reject) => {
         console.log('Attempting to connect to database...');
 
@@ -30,19 +30,19 @@ export default function connectIDB() {
 
                 // ********** Define initial data **********
                 const initialTodos = [
-                    {id: 'todo1', title: 'Groceries'},
+                    {title: 'Groceries'},
                 ];
 
                 const initialTodoListItems = [
-                    {todoId: 'todo1', description: 'Apple', done: true},
-                    {todoId: 'todo1', description: 'Banana', done: true},
-                    {todoId: 'todo1', description: 'Coconut', done: true},
+                    {todoId: 1, description: 'Apple', done: true},
+                    {todoId: 1, description: 'Banana', done: true},
+                    {todoId: 1, description: 'Coconut', done: true},
                 ];
 
                 // ********** Create object stores **********
                 // Note: db.createObjectStore() can only be called within a versionchange transaction
                 // Also note: both of the below db.createObjectStore() share the same transaction
-                const todosObjStore = db.createObjectStore('todos', {keyPath: 'id'});
+                const todosObjStore = db.createObjectStore('todos', {autoIncrement: true});
                 const todoListItemsObjStore = db.createObjectStore('todoListItems', {autoIncrement: true});
 
                 // ********** Define object stores' data types **********
@@ -62,4 +62,80 @@ export default function connectIDB() {
             reject(Error('IndexedDB is not supported in this browser.'));
         }
     })
+}
+
+async function connectObjStore(objStoreName, transType) {
+    const db = await connectIDB();
+
+    return new Promise((resolve, reject) => {
+        if (db instanceof Error) {
+            reject(db);
+        }
+
+        const trans = db.transaction([objStoreName], transType);
+        trans.onerror = () => {
+            reject(Error(`Transaction error when trying to open objStore ${objStoreName}: ${trans.error}`));
+        };
+        trans.oncomplete = () => {
+            console.log(`Successfully completed ${transType} transaction.`);
+        };
+
+        resolve(trans.objectStore(objStoreName));
+    })
+}
+
+async function createTransaction(objStoreName, transType) {
+    /*return new Promise(async (resolve, reject) => {
+        const db = await connectIDB();
+
+        if (db instanceof Error) {
+            reject(Error);
+        }
+
+        const trans = db.transaction([objStoreName], transType);
+        trans.onerror = () => {
+            throw Error(`${transType} transaction error: ${trans.error}`)
+        };
+        trans.oncomplete = () => {
+            console.log(`Successfully completed ${transType} transaction.`);
+        };
+
+        resolve(trans);
+    })*/
+
+    try {
+        const db = await connectIDB();
+
+        const trans = db.transaction([objStoreName], transType);
+        trans.onerror = () => {
+            throw Error(`${transType} transaction error: ${trans.error}`)
+        };
+        trans.oncomplete = () => {
+            console.log(`Successfully completed ${transType} transaction.`);
+        };
+
+        return trans
+    } catch (e) {
+        throw e
+    }
+}
+
+function promisifyRequest(req) {
+    return new Promise((resolve, reject) => {
+        req.onerror = () => {
+            reject(req.error);
+        };
+        req.onsuccess = () => {
+            resolve(req.result);
+        };
+    })
+}
+
+/** ********** EXPORTS ********** */
+
+export {
+    connectIDB,
+    connectObjStore,
+    createTransaction,
+    promisifyRequest,
 }
