@@ -1,4 +1,4 @@
-import {connectObjStore, createTransaction, promisifyRequest} from './connectIDB';
+import {connectObjStore, createTransaction, promisifyRequest, promisifyCursorRequest} from './connectIDB';
 import {inputValid, sanitizeInput} from './inputValid';
 
 /** ********** API LEVEL 1 (PRIVATE) ********** */
@@ -13,28 +13,24 @@ async function itemExist(objStoreName, key) {
         const res = await promisifyRequest(objStore.getKey(sanitizedKey));
 
         return res !== undefined
-
-        /*return new Promise((resolve, reject) => {
-            const req = objStore.getKey(sanitizedKey);
-            req.onerror = () => {
-                reject(Error(`Error getting key: ${req.error}`));
-            };
-            req.onsuccess = () => {
-                console.log('itemExist request succeeded.');
-                resolve(req.result !== undefined);
-            }
-        })*/
     } catch (e) {
         throw e
     }
 }
 
-/**
- * @return Promise - Resolve: Promise contains an array of items pulled from database
- *                   Reject: Promise contains an Error object
- * */
 async function getItemsIndex(objStoreName, indexName, indexKey) {
-    const objStore = await connectObjStore(objStoreName, 'readonly');
+    try {
+        const trans = await createTransaction(objStoreName, 'readonly');
+        const objStore = trans.objectStore(objStoreName);
+        const index = objStore.index(indexName);
+
+        return await promisifyCursorRequest(index.openCursor(indexKey));
+    } catch (e) {
+        throw e
+    }
+
+
+    /*const objStore = await connectObjStore(objStoreName, 'readonly');
 
     return new Promise((resolve, reject) => {
         if (objStore instanceof Error) {
@@ -62,47 +58,31 @@ async function getItemsIndex(objStoreName, indexName, indexKey) {
                 resolve(res);
             }
         };
-    })
+    })*/
 }
 
-/**
- * @return Promise - Resolve: Promise contains the item pulled from database
- *                   Reject: Promise contains an Error object
- * */
+
 async function getItem(objStoreName, key) {
-    const objStore = await connectObjStore(objStoreName, 'readonly');
+    try {
+        const sanitizedKey = sanitizeInput(key);
 
-    return new Promise((resolve, reject) => {
-        if (objStore instanceof Error) {
-            reject(objStore);
-        }
+        const trans = await createTransaction(objStoreName, 'readonly');
+        const objStore = trans.objectStore(objStoreName);
 
-        const req = objStore.get(key);
-
-        req.onerror = () => {
-            reject(Error(`Request error when getting item: ${req.error}`));
-        };
-
-        req.onsuccess = () => {
-            resolve(req.result);
-        };
-    })
+        return await promisifyRequest(objStore.get(sanitizedKey));
+    } catch (e) {
+        throw e
+    }
 }
 
 /** ********** API LEVEL 2 (PUBLIC) ********** */
 
 async function getTodo(todoId) {
-    const todo = inputValid(todoId)
-        ? await getItem('todos', Number(todoId))
-        : Error('Database key should be a number.');
-
-    return new Promise((resolve, reject) => {
-        if (todo instanceof Error) {
-            reject(todo);
-        }
-
-        resolve(todo);
-    })
+    try {
+        return await getItem('todos', todoId)
+    } catch (e) {
+        throw e
+    }
 }
 
 async function getTodoListItems(todoId) {

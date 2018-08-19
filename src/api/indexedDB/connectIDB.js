@@ -85,24 +85,6 @@ async function connectObjStore(objStoreName, transType) {
 }
 
 async function createTransaction(objStoreName, transType) {
-    /*return new Promise(async (resolve, reject) => {
-        const db = await connectIDB();
-
-        if (db instanceof Error) {
-            reject(Error);
-        }
-
-        const trans = db.transaction([objStoreName], transType);
-        trans.onerror = () => {
-            throw Error(`${transType} transaction error: ${trans.error}`)
-        };
-        trans.oncomplete = () => {
-            console.log(`Successfully completed ${transType} transaction.`);
-        };
-
-        resolve(trans);
-    })*/
-
     try {
         const db = await connectIDB();
 
@@ -131,6 +113,30 @@ function promisifyRequest(req) {
     })
 }
 
+function promisifyCursorRequest(req) {
+    return new Promise((resolve, reject) => {
+        let count = 0;
+        const res = [];
+
+        req.onerror = () => {
+            reject(req.error);
+        };
+        req.onsuccess = () => {
+            const cursor = req.result;
+
+            if (cursor) {
+                count += 1;
+                console.log(`Iterated through cursor item #${count}: ${cursor.value.description}.`);
+                res.push(cursor.value);
+                cursor.continue();
+            } else {
+                resolve(res);
+                console.log(`All ${count} cursor item(s) have been iterated through.`);
+            }
+        };
+    })
+}
+
 /** ********** EXPORTS ********** */
 
 export {
@@ -138,4 +144,5 @@ export {
     connectObjStore,
     createTransaction,
     promisifyRequest,
+    promisifyCursorRequest,
 }
