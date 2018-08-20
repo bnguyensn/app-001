@@ -113,30 +113,6 @@ function promisifyRequest(req) {
     })
 }
 
-function promisifyCursorRequest(req) {
-    return new Promise((resolve, reject) => {
-        let count = 0;
-        const res = [];
-
-        req.onerror = () => {
-            reject(req.error);
-        };
-        req.onsuccess = () => {
-            const cursor = req.result;
-
-            if (cursor) {
-                count += 1;
-                console.log(`Iterated through cursor item #${count}: ${cursor.value.description}.`);
-                res.push(cursor.value);
-                cursor.continue();
-            } else {
-                resolve(res);
-                console.log(`All ${count} cursor item(s) have been iterated through.`);
-            }
-        };
-    })
-}
-
 /** ********** EXPORTS ********** */
 
 export {
@@ -144,5 +120,4 @@ export {
     connectObjStore,
     createTransaction,
     promisifyRequest,
-    promisifyCursorRequest,
 }

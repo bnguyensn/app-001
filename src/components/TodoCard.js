@@ -1,49 +1,63 @@
 import * as React from 'react';
 import TodoListItem from './TodoListItem';
-
-function NoListItem() {
-    return (
-        <div>There doesn&#39;t seem to be anything here.</div>
-    )
-}
+import {getTodoListItems} from '../api/indexedDB/readIDB';
+import {addTodoListItem} from '../api/indexedDB/addItemsIDB';
 
 export default class TodoCard extends React.PureComponent {
     constructor(props) {
         super(props);
-        const {todoId, todo} = props;
-        const {title, list} = todo;
-        this.todoId = todoId;
-        this.title = title;
-        this.listEntries = list !== undefined ? Object.entries(list) : [];
+        this.state = {
+            title: '',
+            todoListItemKeys: [],
+        };
     }
 
-    componentDidMount() {
-        this.addNewListItem('', false);
+    async componentDidMount() {
+        try {
+            const {todoId} = this.props;
+
+            const todoListItemKeys = await getTodoListItems(todoId, 'keysonly');
+
+            this.setState(prevState => ({
+                todoListItemKeys: [...prevState.todoListItemKeys, ...todoListItemKeys],
+            }));
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    addNewListItem = (description, done) => {
-        const newListEntryId = `${this.todoId}-item${this.listEntries.length + 1}`;
-        this.listEntries.push([newListEntryId, {description, done}]);
-        this.forceUpdate();
+    addNewListItem = async (description, done) => {
+        const {todoId} = this.props;
+
+        try {
+            const res = await addTodoListItem({todoId, description, done});
+            const newTodoListItemKey = res.data;
+
+            this.setState(prevState => ({
+                todoListItemKeys: [...prevState.todoListItemKeys, ...newTodoListItemKey],
+            }));
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     render() {
-        const listItems = this.listEntries.map((listEntry, i) => {
-            const entryId = listEntry[0];
-            const entryData = listEntry[1];
+        const {todoId} = this.props;
+        const {title, todoListItemKeys} = this.state;
 
-            return (
-                <TodoListItem key={entryId}
-                              todoId={this.todoId} listItemId={entryId}
-                              listItem={entryData}
-                              addNewListItem={i === this.listEntries.length - 1 ? this.addNewListItem : false} />
-            )
-        });
+        const todoListItems = todoListItemKeys.length > 0
+            ? todoListItemKeys.map(todoListItemKey => (
+                <TodoListItem key={todoListItemKey} todoId={todoId} todoListItemId={todoListItemKey} />
+            ))
+            : [];
 
         return (
             <div className="todo-card-container">
-                <section className="todo-card-title">{this.title}</section>
-                <ul className="todo-list-items">{listItems.length > 0 ? listItems : <NoListItem />}</ul>
+                <section className="todo-card-title">{title}</section>
+                <ul className="todo-list-items">
+                    {todoListItems.length > 0 ? todoListItems : false}
+                    <TodoListItem addNewListItem={this.addNewListItem} />
+                </ul>
             </div>
         )
     }

@@ -1,4 +1,5 @@
 import {connectObjStore} from './connectIDB';
+import {sanitizeNumber} from "./inputValidation";
 
 /** ********** API LEVEL 1 (PRIVATE) ********** */
 
@@ -14,9 +15,9 @@ import {connectObjStore} from './connectIDB';
  *                   Reject: Promise contains an Error object
  * */
 async function add(objStoreName, item) {
-    const objStore = await connectObjStore([objStoreName], 'readwrite');
+    return new Promise(async (resolve, reject) => {
+        const objStore = await connectObjStore([objStoreName], 'readwrite');
 
-    return new Promise((resolve, reject) => {
         if (objStore instanceof Error) {
             reject(objStore);
         }
@@ -24,7 +25,7 @@ async function add(objStoreName, item) {
         console.log(`Attempting to add item(s) to objStore ${objStoreName}...`);
 
         if (Array.isArray(item)) {
-            const failedItems = [];
+            const addedItems = [];
             let processedCount = 0;
 
             item.forEach((it) => {
@@ -33,25 +34,29 @@ async function add(objStoreName, item) {
                 req.onerror = () => {
                     processedCount += 1;
                     console.log(`Oops, could not add item ${it}: ${req.error}`);
-                    failedItems.push(it);
-
                     if (processedCount === item.length) {
-                        reject(Error('Could not add any item to database.'));
+                        if (addedItems.length === 0) {
+                            reject(Error('Could not add any item to database.'));
+                        } else {
+                            resolve({
+                                msg: `Successfully added ${addedItems.length} item(s) to database.`,
+                                data: addedItems,
+                            });
+                        }
                     }
                 };
 
                 req.onsuccess = () => {
+                    // req.result = key of the successfully added item
+                    addedItems.push(req.result);
+
                     processedCount += 1;
                     console.log(`Successfully added item ${it}`);
 
                     if (processedCount === item.length) {
-                        const resMsg = failedItems.length === 0
-                            ? 'Successfully added all items to database'
-                            : `${failedItems.length} item(s) could not be added to database,
-                             which have been passed to resolve's data.`;
                         resolve({
-                            msg: resMsg,
-                            data: failedItems.length === 0 ? null : failedItems,
+                            msg: `Successfully added ${addedItems.length} item(s) to database.`,
+                            data: addedItems,
                         });
                     }
                 }
@@ -66,7 +71,7 @@ async function add(objStoreName, item) {
             req.onsuccess = () => {
                 resolve({
                     msg: 'Successfully added item to database',
-                    data: null,
+                    data: req.result,
                 });
             };
         }
@@ -75,25 +80,49 @@ async function add(objStoreName, item) {
 
 /** ********** API LEVEL 2 (PUBLIC) ********** */
 
-async function addTodo(title = '') {
-    const res = await add('todos', {title});
+/**
+ * Could add a single or an array of todo
+ * */
+async function addTodo(todo) {
+    try {
+        // Make sure the item(s) being added is/are in conformity with our database
+        const itemToAdd = Array.isArray(todo)
+            ? todo.map(td => ({title: td.title}))
+            : {title: todo.title};
 
-    return new Promise((resolve, reject) => {
-        if (res instanceof Error) {
-            reject(res);
-        } else {
-            resolve(res);
-        }
-    })
+        return await add('todos', itemToAdd)
+    } catch (e) {
+        throw e
+    }
 }
 
-async function addTodos(todos) {
+/**
+ * Could add a single or an array of todoListItem
+ * */
+async function addTodoListItem(todoListItem) {
+    try {
+        // Make sure the item(s) being added is/are in conformity with our database
+        const itemToAdd = Array.isArray(todoListItem)
+            ? todoListItem.map(tdli => ({
+                todoId: sanitizeNumber(tdli.todoId),
+                description: tdli.description,
+                done: tdli.done,
+            }))
+            : {
+                todoId: sanitizeNumber(todoListItem.todoId),
+                description: todoListItem.description,
+                done: todoListItem.done,
+            };
 
+        return await add('todoListItems', itemToAdd)
+    } catch (e) {
+        throw e
+    }
 }
 
 /** ********** EXPORTS ********** */
 
 export {
     addTodo,
-    addTodos,
+    addTodoListItem,
 }

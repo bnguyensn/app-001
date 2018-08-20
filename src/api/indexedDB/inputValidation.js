@@ -1,8 +1,8 @@
-function inputValid(input) {
+function inputIsNumber(input) {
     return !Number.isNaN(Number(input));
 }
 
-function sanitizeInput(input) {
+function sanitizeNumber(input) {
     if (Number.isNaN(Number(input))) {
         throw Error('Input is not a number')
     }
@@ -11,6 +11,6 @@ function sanitizeInput(input) {
 }
 
 export {
-    inputValid,
-    sanitizeInput,
+    inputIsNumber,
+    sanitizeNumber,
 }

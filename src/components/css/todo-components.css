@@ -1,3 +1,7 @@
+/** ********** ***** ********** **/
+/** ********** BOARD ********** **/
+/** ********** ***** ********** **/
+
 .todo-board-container {
     display: flex;
     flex-direction: column;
@@ -7,6 +11,10 @@
     margin: .5rem;
     text-align: center;
 }
+
+/** ********** **** ********** **/
+/** ********** CARD ********** **/
+/** ********** **** ********** **/
 
 .todo-cards-container {
     display: flex;
@@ -21,6 +29,7 @@
     display: flex;
     flex-direction: column;
 
+    margin: .5em;
     width: 25rem;
     border: 1px solid #757575;
     padding: .5rem 0;
@@ -31,6 +40,10 @@
 .todo-card-title {
     font-size: 1.25rem;
 }
+
+/** ********** ********* ********** **/
+/** ********** LIST ITEM ********** **/
+/** ********** ********* ********** **/
 
 .todo-list-items {
     padding: 0;

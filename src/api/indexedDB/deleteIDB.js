@@ -1,16 +1,11 @@
-export default function deleteIDB() {
-    return new Promise((resolve, reject) => {
+import {promisifyRequest} from "./connectIDB";
+
+export default async function deleteIDB() {
+    try {
         console.log('Initialising database deletion...');
-
-        const req = window.indexedDB.deleteDatabase('todoDB');
-
-        req.onerror = () => {
-            reject(Error(`Error deleting database: ${req.error}`));
-        };
-
-        req.onsuccess = () => {
-            console.log('Successfully deleted database.');
-            resolve();
-        };
-    })
+        await promisifyRequest(window.indexedDB.deleteDatabase('todoDB'));
+        console.log('Successfully deleted database.');
+    } catch (e) {
+        throw e
+    }
 }

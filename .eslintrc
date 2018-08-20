@@ -73,6 +73,7 @@
       }
     ],
     "no-trailing-spaces": "off",
+    "import/named": "off",
     "object-curly-newline": "off",
     "object-curly-spacing": "off",
     "one-var": [
