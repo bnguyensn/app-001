@@ -29,16 +29,24 @@
     display: flex;
     flex-direction: column;
 
-    margin: .5em;
+    margin: .5rem;
     width: 25rem;
     border: 1px solid #757575;
-    padding: .5rem 0;
+    padding: .5rem;
 
     box-shadow: 0 4px 8px #757575;
 }
 
 .todo-card-title {
     font-size: 1.25rem;
+    text-align: left;
+}
+
+/* Ensure there's a height when title is nil */
+.todo-card-title:empty:before {
+    content: attr(placeholder);
+    color: #9E9E9E;
+    cursor: text;
 }
 
 /** ********** ********* ********** **/

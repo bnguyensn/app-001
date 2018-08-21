@@ -1,11 +1,18 @@
 import * as React from 'react';
 import {getTodoListItem} from '../api/indexedDB/readIDB';
+import {addTodoListItem} from '../api/indexedDB/addItemsIDB';
 
+/**
+ * This is an uncontrolled component due to React not working too well
+ * with contenteditable. See https://github.com/facebook/react/issues/2047.
+ * Alternatively, one can use https://draftjs.org.
+ * */
 export default class TodoListItem extends React.PureComponent {
     constructor(props) {
         super(props);
+        this.todoListItemId = props.todoListItemId;
+        this.listItemDescriptionEl = React.createRef();
         this.state = {
-            description: '',
             done: false,
         };
     }
@@ -15,12 +22,12 @@ export default class TodoListItem extends React.PureComponent {
 
         if (todoListItemId) {
             try {
-                // Get todoListItem information from database
-                const todoListItem = await getTodoListItem(todoListItemId);
+                const {description, done} = await getTodoListItem(todoListItemId);
 
+                // Initialise description text and done status
+                this.listItemDescriptionEl.current.textContent += description;
                 this.setState({
-                    description: todoListItem.description,
-                    done: todoListItem.done,
+                    done,
                 });
             } catch (e) {
                 console.log(e);
@@ -32,38 +39,48 @@ export default class TodoListItem extends React.PureComponent {
         this.setState(prevState => ({done: !prevState.done}));
     };
 
-    handleDescriptionUpdate = (e) => {
-        const {addNewListItem} = this.props;  // This prop is only available for the last todoListItem
-        const {description} = this.state;
+    handleDescriptionUpdate = async () => {
+        // If this is the last <TodoListItem /> in a <TodoCard />, the first
+        // edit will:
+        //  - Convert the current <TodoListItem /> to a proper database
+        //    <TodoListItem /> and add new data to database
+        //  - Add a new blank <TodoListItem /> (DOM only)
 
-        this.setState({
-            description: e.currentTarget.textContent,
-        });
+        const {todoId, addNewListItemDOM} = this.props;
+        const {done} = this.state;
 
-        // Any first input to the last todoListItem will:
-        // - add a new empty todoListItem
-        // - add this todoListItem to the database
-        // - automatically remove the ability to add todoListItem, thanks to
-        // <TodoCard />'s re-render
-        if (addNewListItem && description === '') {
-            addNewListItem('', false);
+        const description = this.listItemDescriptionEl.current.textContent;
+
+        const listItemEl = this.listItemDescriptionEl.current.parentNode;
+
+        if (listItemEl.parentNode.lastChild === listItemEl) {
+            console.log('Time to add a new blank TodoListItem!');
+
+            // Add a new blank <TodoListItem /> (DOM only)
+            addNewListItemDOM(todoId);
+
+            // Add new data to database and convert the current <TodoListItem />
+            try {
+                this.todoListItemId = await addTodoListItem({todoId, description, done});
+            } catch (e) {
+                console.log(e);
+            }
         }
     };
 
     render() {
-        const {description, done} = this.state;
+        const {done} = this.state;
 
         return (
             <li className="todo-list-item">
                 <input className="todo-list-item-checkbox"
-                       type="checkbox" checked={done} name={description}
+                       type="checkbox" checked={done}
                        onChange={this.handleDoneStatusUpdate} />
                 <div className="todo-list-item-description"
                      placeholder="List item"
+                     ref={this.listItemDescriptionEl}
                      onInput={this.handleDescriptionUpdate}
-                     contentEditable suppressContentEditableWarning>
-                    {description}
-                </div>
+                     contentEditable />
             </li>
         )
     }
