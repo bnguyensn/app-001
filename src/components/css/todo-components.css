@@ -2,21 +2,40 @@
 /** ********** BOARD ********** **/
 /** ********** ***** ********** **/
 
-.todo-board-container {
+/** ********** Container & Generic children rules ********** **/
+
+.todo-board {
     display: flex;
     flex-direction: column;
 }
+
+.todo-board > section {
+    margin: 1rem 0;
+}
+
+/** ********** Top Control ********** **/
+
+.todo-board-top-control {
+    display: flex;
+    flex-direction: column;
+}
+
+/** ********** Title ********** **/
 
 .todo-board-title {
     margin: .5rem;
     text-align: center;
 }
 
-/** ********** **** ********** **/
-/** ********** CARD ********** **/
-/** ********** **** ********** **/
+/** ********** Create-New ********** **/
 
-.todo-cards-container {
+.todo-create-new {
+
+}
+
+/** ********** Cards ********** **/
+
+.todo-cards {
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
@@ -25,59 +44,113 @@
     margin: .5rem;
 }
 
-.todo-card-container {
+/** ********** **** ********** **/
+/** ********** CARD ********** **/
+/** ********** **** ********** **/
+
+/** ********** Container & Generic children rules ********** **/
+
+.todo-edit {
     display: flex;
     flex-direction: column;
 
     margin: .5rem;
     width: 25rem;
     border: 1px solid #757575;
-    padding: .5rem;
 
     box-shadow: 0 4px 8px #757575;
 }
 
-.todo-card-title {
+/** ********** Title ********** **/
+
+.todo-edit-title {
+    padding: .5rem;
     font-size: 1.25rem;
     text-align: left;
 }
 
-/* Ensure there's a height when title is nil */
-.todo-card-title:empty:before {
+.todo-edit-title:empty:before {
     content: attr(placeholder);
     color: #9E9E9E;
     cursor: text;
+}
+
+/** ********** List of items ********** **/
+
+.todo-list-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+/** ********** Options panel container ********** **/
+
+.todo-card-options-panel {
+    display: flex;
+    justify-content: flex-start;
+    padding: .5rem;
+}
+
+/** ********** Options panel buttons ********** **/
+
+.todo-card-options-panel-btn {
+    padding: 0 .25rem;
+    font-size: 1.5rem;
+    cursor: pointer;
 }
 
 /** ********** ********* ********** **/
 /** ********** LIST ITEM ********** **/
 /** ********** ********* ********** **/
 
-.todo-list-items {
-    padding: 0;
-    list-style: none;
-    text-align: left;
-}
+/** ********** Container & Generic children rules ********** **/
 
 .todo-list-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
 
-    margin: 0;
-    padding: .5rem;
+    margin: .5rem 0;
 }
 
 .todo-list-item:focus-within {
     outline: 1px solid #9E9E9E;
 }
 
-.todo-list-item-checkbox {
-    display: inline-block;
-    margin-right: 1rem;
+.todo-list-item > * {
+    margin: 0 .5rem;
 }
 
+/** ********** Dragger & Deleter ********** **/
+
+.todo-list-item-dragger, .todo-list-item-deleter {
+    visibility: hidden;
+}
+
+.todo-list-item-dragger {
+    cursor: grab;
+}
+
+.todo-list-item-deleter {
+    cursor: pointer;
+}
+
+.todo-list-item:hover .todo-list-item-dragger,
+.todo-list-item:hover .todo-list-item-deleter,
+.todo-list-item:focus-within .todo-list-item-deleter {
+    visibility: visible;
+}
+
+/** ********** Checkbox ********** **/
+
+.todo-list-item-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+/** ********** Description (text) ********** **/
+
 .todo-list-item-description {
-    display: inline-block;
     flex-grow: 1;
 
     white-space: pre-wrap;

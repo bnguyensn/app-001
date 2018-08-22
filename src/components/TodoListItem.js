@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {getTodoListItem} from '../api/indexedDB/readIDB';
 import {addTodoListItem} from '../api/indexedDB/addItemsIDB';
+import MaterialIcon from './MaterialIcon';
 
 /**
  * This is an uncontrolled component due to React not working too well
@@ -20,6 +21,11 @@ export default class TodoListItem extends React.PureComponent {
     async componentDidMount() {
         const {todoListItemId} = this.props;
 
+        if (this.isLastItem()) {
+            // Force a re-render
+            this.forceUpdate();
+        }
+
         if (todoListItemId) {
             try {
                 const {description, done} = await getTodoListItem(todoListItemId);
@@ -34,6 +40,19 @@ export default class TodoListItem extends React.PureComponent {
             }
         }
     }
+
+    // Check if this is the last <TodoListItem /> in a <TodoCard /> i.e. it is
+    // used to add new <TodoListItem />
+    // On the first render immediately before componentDidMount(), this will
+    // always be false. It doesn't matter though because the component will
+    // re-render immediately in componentDidMount()
+    isLastItem = () => {
+        if (this.listItemDescriptionEl.current) {
+            const listItemEl = this.listItemDescriptionEl.current.parentNode;
+            return listItemEl.parentNode.lastChild === listItemEl
+        }
+        return false
+    };
 
     handleDoneStatusUpdate = () => {
         this.setState(prevState => ({done: !prevState.done}));
@@ -51,9 +70,7 @@ export default class TodoListItem extends React.PureComponent {
 
         const description = this.listItemDescriptionEl.current.textContent;
 
-        const listItemEl = this.listItemDescriptionEl.current.parentNode;
-
-        if (listItemEl.parentNode.lastChild === listItemEl) {
+        if (this.isLastItem()) {
             console.log('Time to add a new blank TodoListItem!');
 
             // Add a new blank <TodoListItem /> (DOM only)
@@ -61,26 +78,46 @@ export default class TodoListItem extends React.PureComponent {
 
             // Add new data to database and convert the current <TodoListItem />
             try {
-                this.todoListItemId = await addTodoListItem({todoId, description, done});
+                const {data} = await addTodoListItem({todoId, description, done});
+                this.todoListItemId = data;
             } catch (e) {
                 console.log(e);
             }
         }
     };
 
+    handleDescriptionUnfocus = () => {
+        console.log(`TodoListItem primaryKey = ${this.todoListItemId} has been unfocused.`);
+    };
+
     render() {
         const {done} = this.state;
 
+        // On the first render immediately before componentDidMount(), this will
+        // always be false. It doesn't matter though because the component will
+        // re-render immediately in componentDidMount()
+        const lastItem = this.isLastItem();
+
         return (
             <li className="todo-list-item">
-                <input className="todo-list-item-checkbox"
-                       type="checkbox" checked={done}
-                       onChange={this.handleDoneStatusUpdate} />
+                {!lastItem
+                    ? <MaterialIcon className="todo-list-item-dragger md-dark" icon="drag_indicator" />
+                    : <div style={{width: '1rem', height: '1rem'}} />
+                }
+                <div className="todo-list-item-checkbox">
+                    <input type="checkbox" checked={done}
+                           onChange={this.handleDoneStatusUpdate} />
+                </div>
                 <div className="todo-list-item-description"
                      placeholder="List item"
                      ref={this.listItemDescriptionEl}
                      onInput={this.handleDescriptionUpdate}
+                     onBlur={this.handleDescriptionUnfocus}
                      contentEditable />
+                {!lastItem
+                    ? <MaterialIcon className="todo-list-item-deleter md-dark" icon="cancel" />
+                    : <div style={{width: '1rem', height: '1rem'}} />
+                }
             </li>
         )
     }

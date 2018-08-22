@@ -1,6 +1,6 @@
 import * as React from 'react';
 import TodoCreateNew from './TodoCreateNew';
-import TodoCard from './TodoCard';
+import TodoEdit from './TodoEdit';
 import './css/todo-components.css';
 import {connectIDB} from '../api/indexedDB/connectIDB';
 import deleteIDB from '../api/indexedDB/deleteIDB';
@@ -40,19 +40,21 @@ export default class TodoBoard extends React.PureComponent {
         console.log(`TodoBoard's todoKeys: ${todoKeys}`);
 
         const todoCards = todoKeys.length > 0
-            ? todoKeys.map(todoKey => <TodoCard key={todoKey} todoId={todoKey} />)
+            ? todoKeys.map(todoKey => <TodoEdit key={todoKey} todoId={todoKey} />)
             : [];
 
         return (
-            <div className="todo-board-container">
-                <div className="todo-board-title">{`${this.username}'s to-do tracker`}</div>
-                <TodoCreateNew />
-                <div className="todo-cards-container">
+            <div className="todo-board">
+                <section className="todo-board-top-control">
+                    <div className="todo-board-title">{`${this.username}'s to-do tracker`}</div>
+                    <TodoCreateNew />
+                </section>
+                <section className="todo-cards">
                     {todoCards.length > 0
                         ? todoCards
                         : <EmptyBoard />
                     }
-                </div>
+                </section>
             </div>
         )
     }
