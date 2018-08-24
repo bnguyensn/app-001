@@ -1,20 +1,21 @@
 import {connectObjStore} from './connectIDB';
-import {sanitizeNumber} from "./inputValidation";
+import {sanitizeNumber} from './inputValidation';
 
 /** ********** API LEVEL 1 (PRIVATE) ********** */
 
 /**
  * @param objStoreName - Name of the IDBObjectStore that the item will be added into
  * @param item - Could be an array of values or just a value
+ * @param [put] - Use IDBObjectStore.put() instead of IDBObjectStore.add()
+ * @param [putKey] - Optional key parameter if IDBObjectStore.put() is used
  * @return Promise - Resolve: Promise contains an object:
  *                            - msg: Success message
- *                            - data: If item is an array and if there are some array values
- *                                    that could not be added to database, this will be an
- *                                    array containing these "failed" values. Otherwise this
- *                                    will be null
+ *                            - data: Array containing added items' primary keys
+ *                            if an array of item was added, or just a single
+ *                            primary key
  *                   Reject: Promise contains an Error object
  * */
-async function add(objStoreName, item) {
+async function add(objStoreName, item, put = false, putKey = undefined) {
     return new Promise(async (resolve, reject) => {
         const objStore = await connectObjStore([objStoreName], 'readwrite');
 
@@ -29,7 +30,7 @@ async function add(objStoreName, item) {
             let processedCount = 0;
 
             item.forEach((it) => {
-                const req = objStore.add(it);
+                const req = put ? objStore.put(it, putKey) : objStore.add(it);
 
                 req.onerror = () => {
                     processedCount += 1;
@@ -62,7 +63,7 @@ async function add(objStoreName, item) {
                 }
             });
         } else {
-            const req = objStore.add(item);
+            const req = put ? objStore.put(item, putKey) : objStore.add(item);
 
             req.onerror = () => {
                 reject(Error(`Could not add item to database: ${req.error}`));
@@ -81,7 +82,7 @@ async function add(objStoreName, item) {
 /** ********** API LEVEL 2 (PUBLIC) ********** */
 
 /**
- * Could add a single or an array of todo
+ * Could add a single or an array of todos
  * */
 async function addTodo(todo) {
     try {
@@ -91,6 +92,22 @@ async function addTodo(todo) {
             : {title: todo.title};
 
         return await add('todos', itemToAdd)
+    } catch (e) {
+        throw e
+    }
+}
+
+/**
+ * Could put a single or an array of todos
+ * */
+async function putTodo(todo, putKey = undefined) {
+    try {
+        // Make sure the item(s) being added is/are in conformity with our database
+        const itemToAdd = Array.isArray(todo)
+            ? todo.map(td => ({title: td.title}))
+            : {title: todo.title};
+
+        return await add('todos', itemToAdd, true, putKey)
     } catch (e) {
         throw e
     }
@@ -120,9 +137,35 @@ async function addTodoListItem(todoListItem) {
     }
 }
 
+/**
+ * Could put a single or an array of todoListItem
+ * */
+async function putTodoListItem(todoListItem, putKey = undefined) {
+    try {
+        // Make sure the item(s) being added is/are in conformity with our database
+        const itemToAdd = Array.isArray(todoListItem)
+            ? todoListItem.map(tdli => ({
+                todoId: sanitizeNumber(tdli.todoId),
+                description: tdli.description,
+                done: tdli.done,
+            }))
+            : {
+                todoId: sanitizeNumber(todoListItem.todoId),
+                description: todoListItem.description,
+                done: todoListItem.done,
+            };
+
+        return await add('todoListItems', itemToAdd, true, putKey)
+    } catch (e) {
+        throw e
+    }
+}
+
 /** ********** EXPORTS ********** */
 
 export {
     addTodo,
     addTodoListItem,
+    putTodo,
+    putTodoListItem,
 }
