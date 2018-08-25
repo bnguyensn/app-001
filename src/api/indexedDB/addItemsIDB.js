@@ -23,7 +23,7 @@ async function add(objStoreName, item, put = false, putKey = undefined) {
             reject(objStore);
         }
 
-        console.log(`Attempting to add item(s) to objStore ${objStoreName}...`);
+        console.log(`Attempting to add/put item(s) to objStore ${objStoreName}...`);
 
         if (Array.isArray(item)) {
             const addedItems = [];
@@ -34,13 +34,13 @@ async function add(objStoreName, item, put = false, putKey = undefined) {
 
                 req.onerror = () => {
                     processedCount += 1;
-                    console.log(`Oops, could not add item ${it}: ${req.error}`);
+                    console.log(`Oops, could not add/put item ${it}: ${req.error}`);
                     if (processedCount === item.length) {
                         if (addedItems.length === 0) {
-                            reject(Error('Could not add any item to database.'));
+                            reject(Error('Could not add/put any item to database.'));
                         } else {
                             resolve({
-                                msg: `Successfully added ${addedItems.length} item(s) to database.`,
+                                msg: `Successfully added/put ${addedItems.length} item(s) to database.`,
                                 data: addedItems,
                             });
                         }
@@ -52,11 +52,11 @@ async function add(objStoreName, item, put = false, putKey = undefined) {
                     addedItems.push(req.result);
 
                     processedCount += 1;
-                    console.log(`Successfully added item ${it}`);
+                    console.log(`Successfully added/put item ${it}`);
 
                     if (processedCount === item.length) {
                         resolve({
-                            msg: `Successfully added ${addedItems.length} item(s) to database.`,
+                            msg: `Successfully added/put ${addedItems.length} item(s) to database.`,
                             data: addedItems,
                         });
                     }
@@ -66,12 +66,12 @@ async function add(objStoreName, item, put = false, putKey = undefined) {
             const req = put ? objStore.put(item, putKey) : objStore.add(item);
 
             req.onerror = () => {
-                reject(Error(`Could not add item to database: ${req.error}`));
+                reject(Error(`Could not add/put item to database: ${req.error}`));
             };
 
             req.onsuccess = () => {
                 resolve({
-                    msg: 'Successfully added item to database',
+                    msg: 'Successfully added/put item to database',
                     data: req.result,
                 });
             };

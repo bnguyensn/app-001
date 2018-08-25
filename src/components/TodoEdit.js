@@ -1,5 +1,5 @@
 import * as React from 'react';
-import TodoListItem from './TodoListItem';
+import TodoListItemEdit from './TodoListItemEdit';
 import {getTodo, getTodoListItems} from '../api/indexedDB/readIDB';
 import MaterialIcon from './MaterialIcon';
 
@@ -19,12 +19,13 @@ export default class TodoEdit extends React.PureComponent {
     }
 
     async componentDidMount() {
-        try {
-            const {todoId} = this.props;
+        const {logStatus, todoId} = this.props;
 
+        try {
             let title = '';
             let todoListItems = [];
 
+            // Initialise data, if there is any
             if (todoId) {
                 // Get database data
                 const titlePromise = getTodo(todoId);
@@ -40,10 +41,11 @@ export default class TodoEdit extends React.PureComponent {
                 todoListItems = [
                     ...todoListItems,
                     ...todoListItemKeys.map(todoListItemKey => (
-                        <TodoListItem key={this.getNewKey()}
-                                      todoId={todoId}
-                                      todoListItemId={todoListItemKey}
-                                      addNewListItemDOM={this.addNewListItemDOM} />
+                        <TodoListItemEdit key={this.getNewKey()}
+                                          todoId={todoId}
+                                          todoListItemId={todoListItemKey}
+                                          logStatus={logStatus}
+                                          addNewListItemDOM={this.addNewListItemDOM} />
                     )),
                 ];
             }
@@ -54,41 +56,74 @@ export default class TodoEdit extends React.PureComponent {
             // Then add a blank <TodoListItem /> which has the purpose of
             // creating new <TodoListItem />
             todoListItems.push(
-                <TodoListItem key={this.getNewKey()}
-                              todoId={todoId}
-                              addNewListItemDOM={this.addNewListItemDOM} />,
+                <TodoListItemEdit key={this.getNewKey()}
+                                  todoId={todoId}
+                                  logStatus={logStatus}
+                                  addNewListItemDOM={this.addNewListItemDOM} />,
             );
 
-            // And finally merge with current state to update DOM <TodoListItem />
+            // And finally merge with current state to update the virtual DOM
             this.setState(prevState => ({
                 todoListItems: [...prevState.todoListItems, ...todoListItems],
             }));
         } catch (e) {
-            console.log(e);
+            logStatus(e)
         }
     }
 
+    getTDTitle = () => {
+        if (this.todoCardTitleEl.current) {
+            return this.todoCardTitleEl.current.textContent
+        }
+        return ''
+    };
+
+    // Can't use database primary keys of todoListItems as key because we have a
+    // blank <TodoListItem /> in todoListItems. Thus we generate unique keys
+    // based on a global counter (global = with respect to this <TodoEdit />
+    // instance.
+    getNewKey = () => {
+        const key = `key${this.keysCount}`;
+        this.keysCount += 1;
+        return key
+    };
+
     addNewListItemDOM = (todoId, todoListItemKey = undefined) => {
+        const {logStatus} = this.props;
+
         const NewTodoListItem = (
-            <TodoListItem key={this.getNewKey()}
-                          todoId={todoId}
-                          todoListItemKey={todoListItemKey}
-                          addNewListItemDOM={this.addNewListItemDOM} />
+            <TodoListItemEdit key={this.getNewKey()}
+                              todoId={todoId}
+                              todoListItemKey={todoListItemKey}
+                              logStatus={logStatus}
+                              addNewListItemDOM={this.addNewListItemDOM} />
         );
-
-
 
         this.setState(prevState => ({
             todoListItems: [...prevState.todoListItems, NewTodoListItem],
         }));
     };
 
-    // Can't use todoListItemKey as key because we have a blank <TodoListItem />
-    // in todoListItems. Thus we generate unique keys based on a global counter.
-    getNewKey = () => {
-        const key = `key${this.keysCount}`;
-        this.keysCount += 1;
-        return key
+    /** To-do event handlers **/
+
+    handleTDTitleInput = () => {
+        const {handleTitleInput} = this.props;
+        handleTitleInput(this.getTDTitle());
+    };
+
+    /** TodoListItem event handlers **/
+
+    handleTDLIAddNew = () => {
+        const {handleTDLIAddNew} = this.props;
+        const newTDLIKey = handleTDLIAddNew();
+    };
+
+    handleTDLIDoneChange = (tdliId, newDone) => {
+        this.info[tdliId].done = newDone;
+    };
+
+    handleTDLIDescInput = (tdliId, newDesc) => {
+        this.info[tdliId].description = newDesc;
     };
 
     render() {
@@ -97,9 +132,10 @@ export default class TodoEdit extends React.PureComponent {
         return (
             <div className="todo-edit">
                 <div className="todo-edit-title"
-                     ref={this.todoCardTitleEl}
                      placeholder="Title"
-                     contentEditable />
+                     contentEditable
+                     onInput={this.handleTDTitleInput}
+                     ref={this.todoCardTitleEl} />
                 <ul className="todo-list-items">
                     {todoListItems.length > 0 ? todoListItems : null}
                 </ul>
