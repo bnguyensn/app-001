@@ -31,7 +31,38 @@
 /** ********** Create-New ********** **/
 
 .todo-create-new {
+    display: flex;
+    flex-direction: column;
 
+    margin: .5rem;
+    width: 25rem;
+    border: 1px solid #757575;
+
+    box-shadow: 0 4px 8px #757575;
+}
+
+.todo-create-new-title {
+    padding: .5rem;
+    font-size: 1.25rem;
+    text-align: left;
+}
+
+.todo-create-new-list-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+.todo-create-new-list-item {
+    display: flex;
+    align-items: center;
+
+    margin: .5rem 0;
+}
+
+.todo-create-new-list-item > * {
+    margin: 0 .5rem;
 }
 
 /** ********** Cards ********** **/
@@ -40,14 +71,69 @@
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
-    flex-flow: column wrap;
+    flex-flow: row wrap;
 
     margin: .5rem;
 }
 
-/** ********** **** ********** **/
-/** ********** CARD ********** **/
-/** ********** **** ********** **/
+/** ********** ********** ********** **/
+/** ********** TO-DO CARD ********** **/
+/** ********** ********** ********** **/
+
+.todo-card {
+    display: flex;
+    flex-direction: column;
+
+    margin: .5rem;
+    width: 25rem; max-height: 50rem;
+    border: 1px solid #757575;
+
+    box-shadow: 0 4px 8px #757575;
+
+    cursor: pointer;
+}
+
+.todo-card-title {
+    padding: .5rem;
+    font-size: 1.25rem;
+    text-align: left;
+}
+
+.todo-card-list-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+.todo-card-list-item {
+    display: flex;
+    align-items: center;
+
+    margin: .5rem 0;
+}
+
+.todo-card-list-item > * {
+    margin: 0 .5rem;
+}
+
+.todo-card-list-item-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+.todo-card-list-item-description {
+    flex-grow: 1;
+
+    white-space: pre-wrap;
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/** ********** ********** ********** **/
+/** ********** TO-DO EDIT ********** **/
+/** ********** ********** ********** **/
 
 /** ********** Container & Generic children rules ********** **/
 
