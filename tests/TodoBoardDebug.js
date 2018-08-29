@@ -1,5 +1,5 @@
 import * as React from 'react';
-import TodoCreateNew from './TodoCreateNew';
+import TodoCreateNewOld from './TodoCreateNew';
 import TodoEdit from './TodoEdit';
 import './css/todo-components.css';
 import {connectIDB} from '../api/indexedDB/connectIDB';

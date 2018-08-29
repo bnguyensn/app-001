@@ -83,6 +83,8 @@ async function add(objStoreName, item, put = false, putKey = undefined) {
 
 /**
  * Could add a single or an array of todos
+ * @param {Object} todo - Could be a todo object or an array of todo objects
+ * @return The added todo's primary key, or an array of them
  * */
 async function addTodo(todo) {
     try {
@@ -115,21 +117,30 @@ async function putTodo(todo, putKey = undefined) {
 
 /**
  * Could add a single or an array of todoListItem
+ * @return The added todoListItem's primary key, or an array of them
  * */
 async function addTodoListItem(todoListItem) {
     try {
         // Make sure the item(s) being added is/are in conformity with our database
-        const itemToAdd = Array.isArray(todoListItem)
-            ? todoListItem.map(tdli => ({
+        let itemToAdd;
+
+        if (Array.isArray(todoListItem) && todoListItem.length === 0) {
+            return Error('Error: attempting to add an empty array of todoListItems')
+        }
+
+        if (Array.isArray(todoListItem) && todoListItem.length > 0) {
+            itemToAdd = todoListItem.map(tdli => ({
                 todoId: sanitizeNumber(tdli.todoId),
                 description: tdli.description,
                 done: tdli.done,
-            }))
-            : {
+            }));
+        } else {
+            itemToAdd = {
                 todoId: sanitizeNumber(todoListItem.todoId),
                 description: todoListItem.description,
                 done: todoListItem.done,
             };
+        }
 
         return await add('todoListItems', itemToAdd)
     } catch (e) {

@@ -1,0 +1,5 @@
+.text-edit:empty:before {
+    content: attr(placeholder);
+    color: #9E9E9E;
+    cursor: text;
+}

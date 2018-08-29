@@ -58,17 +58,20 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         const {tdKey, logNewMsg} = this.props;
 
         try {
-            const tdData = getTodo(tdKey);
-            const tdliData = getAllTodoListItems(tdKey, 'all');
-            await tdData;
-            await tdliData;
+            const tdDataPromise = getTodo(tdKey);
+            const tdliDataPromise = getAllTodoListItems(tdKey, 'all');
+            const tdData = await tdDataPromise;
+            const tdlisData = await tdliDataPromise;
 
-            const tdliKeys = tdliData.map(tdliData => tdliData[0]);
-            const tdliValuesArr = tdliData.map(tdliData => tdliData[1]);
+            console.log(tdlisData);
+
+            const tdliKeys = tdlisData.map(tdliData => tdliData[0]);
+            const tdliValuesArr = tdlisData.map(tdliData => tdliData[1]);
             const tdliValues = {};
             tdliKeys.forEach((tdliKey, index) => {
+                tdliValues[tdliKey] = {};
                 tdliValues[tdliKey].done = tdliValuesArr[index].done;
-                tdliValues[tdliKey].desc = tdliValuesArr[index].desc;
+                tdliValues[tdliKey].desc = tdliValuesArr[index].description;
             });
 
             this.setState({
@@ -88,7 +91,7 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
             const tdliDone = tdliValues[tdliKey].done;
             const tdliDesc = tdliValues[tdliKey].desc;
 
-            return <TDLI tdliDone={tdliDone} tdliDesc={tdliDesc} />
+            return <TDLI key={tdliKey} tdliDone={tdliDone} tdliDesc={tdliDesc} />
         });
 
         return (

@@ -5,21 +5,21 @@ import {getTodoListItem} from '../api/indexedDB/readIDB';
 import {addTodo, addTodoListItem, putTodoListItem} from '../api/indexedDB/addItemsIDB';
 import MaterialIcon from './MaterialIcon';
 
-type dbKeyData = {
-    todoId: string,
-    todoListItemId: string,
+type DBKeyData = {
+    todoId: ?string,
+    todoListItemId: ?string,
 };
 
-type dbValueData = {
+type DBValueData = {
     tdliDone: boolean,
     tdliDesc: string,
 };
 
 type TodoListItemEditProps = {
-    dbKeyData: dbKeyData,
-    dbValueData: dbValueData,
-    handleDoneUpdate: (todoListItemId: string, newValue: boolean) => void
-    handleDescUpdate: (todoListItemId: string, newValue: string) => void
+    dbKeyData: DBKeyData,
+    dbValueData: DBValueData,
+    handleTdliDoneUpdate: (todoListItemId: ?string, newValue: boolean) => void,
+    handleTdliDescUpdate: (todoListItemId: ?string, newValue: string) => void,
 };
 
 /**
@@ -28,8 +28,8 @@ type TodoListItemEditProps = {
  * Alternatively, one can use https://draftjs.org.
  * */
 export default class TodoListItemEdit extends React.PureComponent<TodoListItemEditProps, {}> {
-    dbKeyData: dbKeyData;
-    descEl: { current: null | HTMLElement };
+    dbKeyData: DBKeyData;
+    descEl: { current: null | HTMLDivElement };
 
     static defaultProps = {
         dbKeyData: {todoId: undefined, todoListItemId: undefined},
@@ -64,7 +64,9 @@ export default class TodoListItemEdit extends React.PureComponent<TodoListItemEd
         }
 
         // Pass control of contenteditable elements over to this component
-        this.setDesc(tdliDesc);
+        if (this.descEl.current) {
+            this.descEl.current.textContent += tdliDesc;
+        }
 
         // TODO: delete
         /*if (todoListItemId) {
@@ -100,29 +102,53 @@ export default class TodoListItemEdit extends React.PureComponent<TodoListItemEd
         return ''
     };
 
-    setDesc = (desc) => {
-        if (this.descEl.current) {
-            this.descEl.current.textContent += desc;
-        }
-    };
-
     handleDoneUpdate = () => {
-        const {dbKeyData, dbValueData, handleDoneUpdate} = this.props;
-        const {todoListItemId} = dbKeyData;
+        const {dbValueData, handleTdliDoneUpdate} = this.props;
+        const {todoListItemId} = this.dbKeyData;
         const {tdliDone} = dbValueData;
+
         if (todoListItemId) {
-            handleDoneUpdate(todoListItemId, !tdliDone);
+            handleTdliDoneUpdate(todoListItemId, !tdliDone);
         }
     };
 
     handleDescUpdate = () => {
-        const {dbKeyData, handleDescUpdate} = this.props;
-        const {todoListItemId} = dbKeyData;
+        const {handleTdliDescUpdate} = this.props;
+        const {todoListItemId} = this.dbKeyData;
 
         if (this.isLastItem()) {
-            handleDescUpdate(todoListItemId, this.getDesc());
+            handleTdliDescUpdate(todoListItemId, this.getDesc());
         }
     };
+
+    render() {
+        const {dbValueData} = this.props;
+        const {tdliDone} = dbValueData;
+
+        const lastItem = this.isLastItem();
+
+        return (
+            <li className="todo-list-item">
+                {!lastItem
+                    ? <MaterialIcon className="todo-list-item-dragger md-dark" icon="drag_indicator" />
+                    : <div style={{width: '1rem', height: '1rem'}} />
+                }
+                <div className="todo-list-item-checkbox">
+                    <input type="checkbox" checked={tdliDone}
+                           onChange={this.handleDoneUpdate} />
+                </div>
+                <div className="todo-list-item-description"
+                     placeholder="List item"
+                     ref={this.descEl}
+                     onInput={this.handleDescUpdate}
+                     contentEditable />
+                {!lastItem
+                    ? <MaterialIcon className="todo-list-item-deleter md-dark" icon="cancel" />
+                    : <div style={{width: '1rem', height: '1rem'}} />
+                }
+            </li>
+        )
+    }
 
     // TODO: delete
     /*handleDoneUpdate = async () => {
@@ -147,7 +173,8 @@ export default class TodoListItemEdit extends React.PureComponent<TodoListItemEd
         }
     };*/
 
-    handleTDLIDescInput = async () => {
+    // TODO: delete
+    /*handleTDLIDescInput = async () => {
         const {todoId, addNewListItemDOM, handleTDLIAddNew, handleTDLIDescInput, logStatus} = this.props;
         const {done} = this.state;
         const description = this.getDesc();
@@ -173,15 +200,16 @@ export default class TodoListItemEdit extends React.PureComponent<TodoListItemEd
         } else if (this.todoListItemId) {
             // Update database if applicable
             // Currently disabled - Only update database on blur
-            /*try {
+            /!*try {
                 logStatus((await putTodoListItem({todoId, description, done}, this.todoListItemId)).msg);
             } catch (e) {
                 logStatus(e);
-            }*/
+            }*!/
         }
-    };
+    };*/
 
-    handleTDLIDescBlur = async () => {
+    // TODO: delete
+    /*handleTDLIDescBlur = async () => {
         const {todoId, addNewListItemDOM, handleTDLIAddNew, handleTDLIDescBlur, logStatus} = this.props;
         const {done} = this.state;
         const description = this.getDesc();
@@ -198,11 +226,11 @@ export default class TodoListItemEdit extends React.PureComponent<TodoListItemEd
             // Creating new To-do
             handleTDLIDescBlur(this.todoListItemId, this.getDesc());
         }
-    };
+    };*/
 
-    // Currently disabled
-    handleDescriptionBlur = async () => {
-        /*const {todoId, todoListItemId, done, handleBlur} = this.props;
+    // TODO: delete
+    /*handleDescriptionBlur = async () => {
+        /!*const {todoId, todoListItemId, done, handleBlur} = this.props;
         const description = e.target.textContent;
 
         // Save data
@@ -233,35 +261,6 @@ export default class TodoListItemEdit extends React.PureComponent<TodoListItemEd
                     throw err
                 }
             }
-        }*/
-    };
-
-    render() {
-        const {dbKeyData, dbValueData} = this.props;
-        const {tdliDone} = dbValueData;
-
-        const lastItem = this.isLastItem();
-
-        return (
-            <li className="todo-list-item">
-                {!lastItem
-                    ? <MaterialIcon className="todo-list-item-dragger md-dark" icon="drag_indicator" />
-                    : <div style={{width: '1rem', height: '1rem'}} />
-                }
-                <div className="todo-list-item-checkbox">
-                    <input type="checkbox" checked={tdliDone}
-                           onChange={this.handleDoneUpdate} />
-                </div>
-                <div className="todo-list-item-description"
-                     placeholder="List item"
-                     ref={this.descEl}
-                     onInput={this.handleDescUpdate}
-                     contentEditable />
-                {!lastItem
-                    ? <MaterialIcon className="todo-list-item-deleter md-dark" icon="cancel" />
-                    : <div style={{width: '1rem', height: '1rem'}} />
-                }
-            </li>
-        )
-    }
+        }*!/
+    };*/
 }

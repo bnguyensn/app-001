@@ -82,6 +82,7 @@ async function getItemsByIndex(objStoreName, indexName, indexKey, returnMode = '
                 } else {
                     resolve(res);
                     console.log(`All ${count} cursor item(s) have been found.`);
+                    console.log(`Returning: ${res}`);
                 }
             };
         })
@@ -133,7 +134,7 @@ async function getTodoListItem(todoListItemId) {
  *      - returnMode keysonly: return array of keys
  *      - returnMode valuesonly: return array of values
  * */
-async function getTodoListItems(todoId, returnMode = 'all') {
+async function getAllTodoListItems(todoId, returnMode = 'all') {
     try {
         // todoId should be a number
         return await getItemsByIndex('todoListItems', 'todoId', sanitizeNumber(todoId), returnMode)
@@ -150,5 +151,5 @@ export {
     getAllTodos,
     getAllTodoKeys,
     getTodoListItem,
-    getTodoListItems,
+    getAllTodoListItems,
 }

@@ -1,7 +1,7 @@
 {
   "extends": [
-    "airbnb"
-    /*"plugin:flowtype/recommended",*/
+    "airbnb",
+    "plugin:flowtype/recommended"
   ],
   "parser": "babel-eslint",
   "env": {
@@ -12,7 +12,7 @@
     "mongo": true
   },
   "plugins": [
-    /*"flowtype",*/
+    "flowtype",
     "jsx-a11y"
   ],
   "globals": {
@@ -49,6 +49,7 @@
         "props": false
       }
     ],
+    "no-undef": "off",
     "no-unused-vars": 0,
     "no-console": [
       "error",
@@ -72,6 +73,7 @@
         "allowForLoopAfterthoughts": true
       }
     ],
+    "no-shadow": "off",
     "no-trailing-spaces": "off",
     "import/named": "off",
     "object-curly-newline": "off",
