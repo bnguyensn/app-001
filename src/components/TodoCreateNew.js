@@ -69,14 +69,13 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         const res = await this.saveTdToDB();
         console.log('saveTdToDB() finishes');
         if (logger) {
-            console.log(`Logging res ${res}`);
             if (res instanceof Error) {
                 logger(res);
             } else {
                 logger(res.msg);
             }
         } else {
-            console.log(`Here's res: ${res}`);
+            console.log(`Here's res: ${res.toString()}`);
         }
     }
 
@@ -106,7 +105,7 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
 
         // Add new TDLI if applicable
         const tdliEl = textEditEl.parentNode;
-        if (this.isTdliLastItem(tdliEl)) {
+        if (tdliEl && this.isTdliLastItem(tdliEl)) {
             this.addNewTdli();
         }
     };
