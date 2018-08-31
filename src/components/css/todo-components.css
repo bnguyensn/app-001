@@ -7,10 +7,12 @@
 .todo-board {
     display: flex;
     flex-direction: column;
+    padding: .5rem;
+    max-width: 100%;
 }
 
-.todo-board > section {
-    margin: 1rem 0;
+.todo-board * {
+    max-width: 100%;
 }
 
 /** ********** Top Control ********** **/
@@ -19,6 +21,21 @@
     display: flex;
     align-items: center;
     flex-direction: column;
+}
+
+/** ********** Logs ********** **/
+
+#todo-board-logs {
+    height: 3rem;
+    padding: .25rem;
+    background-color: #212121;
+    overflow: scroll;
+}
+
+.todo-board-log {
+    font: .75em Consolas, monospace;
+    color: #fafafa;
+    text-align: left;
 }
 
 /** ********** Title ********** **/

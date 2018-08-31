@@ -34,7 +34,8 @@ function TDLI(props: TDLIProps) {
 
 type TodoCreateNewProps = {
     logger?: (msg: string) => void,
-}
+    dbSync: () => Promise<string>,
+};
 
 type TodoCreateNewStates = {
     tdliKeys: string[],
@@ -63,19 +64,22 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
     }
 
     async componentWillUnmount() {
-        const {logger} = this.props;
+        const {logger, dbSync} = this.props;
 
-        console.log('saveTdToDB() starting');
-        const res = await this.saveTdToDB();
-        console.log('saveTdToDB() finishes');
+        const resAddNewData = await this.saveTdToDB();
         if (logger) {
-            if (res instanceof Error) {
-                logger(res);
+            if (resAddNewData instanceof Error) {
+                logger(resAddNewData);
             } else {
-                logger(res.msg);
+                logger(resAddNewData.msg);
             }
-        } else {
-            console.log(`Here's res: ${res.toString()}`);
+        }
+
+        if (Object.entries(resAddNewData.data).length !== 0 || resAddNewData instanceof Error) {
+            const resDbSync = await dbSync();
+            if (logger) {
+                logger(resDbSync);
+            }
         }
     }
 
@@ -121,8 +125,6 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         }));
     };
 
-    checkEmptyData = () => this.checkEmptyTdTitle() && this.checkEmptyTdliValues();
-
     checkEmptyTdTitle = () => this.tdTitle === '';
 
     checkEmptyTdliValues = () => {
@@ -130,8 +132,20 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         return tdliKeys.every(tdliKey => this.tdliValues[tdliKey].desc === '');
     };
 
+    checkNoChanges = () => {
+        const {tdliKeys} = this.state;
+        return this.checkEmptyTdTitle() && tdliKeys.length <= 1
+    };
+
     saveTdToDB = async () => {
         try {
+            if (this.checkNoChanges()) {
+                return {
+                    msg: '',
+                    data: {},
+                }
+            }
+
             const {tdliKeys} = this.state;
 
             if (this.checkEmptyTdliValues()) {
@@ -139,7 +153,7 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
                     // No TD and TDLI data
 
                     return {
-                        msg: 'To-do list is empty - No database transaction initiated.',
+                        msg: '',
                         data: {},
                     }
                 }

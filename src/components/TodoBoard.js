@@ -21,7 +21,8 @@ function LogMessage(props: {msg: string}) {
 }
 
 type TodoBoardStates = {
-    logMsgData: {},
+    logMsgData: {},  // Structure: {logMsgKey: msg: x, ...}
+    logMsgKeys: number[],  // Need this to display logMsgData in chronological order
     tdKeys: string[],
     todoCreateNewKey: boolean,
 };
@@ -33,46 +34,62 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         super(props);
         this.logMsgKeysCount = 0;
         this.state = {
-            logMsgData: {},  // Structure: {logMsgKey: msg: x, ...}
+            logMsgData: {},
+            logMsgKeys: [],
             tdKeys: [],
             todoCreateNewKey: false,  // Used to reset <TodoCreateNew />
         };
     }
 
     async componentDidMount() {
-        try {
-            const tdKeys = await getAllTodoKeys();
+        const res = await this.syncWithDb();
+        this.logNewMsg(res);
+    }
 
-            // Render INITIAL tdKeys data. Each tdCard will then request data
-            // on their own.
-            this.setState({
-                tdKeys,
-            });
-        } catch (e) {
-            this.logNewMsg(e);
+    componentDidUpdate() {
+        // Scroll to the bottom of the logs
+        const logsEl = document.getElementById('todo-board-logs');
+        if (logsEl) {
+            logsEl.scrollTop = logsEl.scrollHeight;
         }
     }
 
+    syncWithDb = async () => {
+        try {
+            const tdKeys = await getAllTodoKeys();
+            this.setState({
+                tdKeys,
+            });
+            return 'TodoBoard synchronised with database.'
+        } catch (e) {
+            return e
+        }
+    };
+
     logNewMsg = (msg: string | Error) => {
-        const {logMsgData} = this.state;
-        const newLogKey = this.logMsgKeysCount;
-        this.logMsgKeysCount += 1;
+        if (msg) {
+            const {logMsgData} = this.state;
+            const newLogMsgKey = this.logMsgKeysCount;
+            this.logMsgKeysCount += 1;
 
-        const newLogMsg = msg instanceof Error ? `${msg.name}: ${msg.message}` : msg;
+            const newLogMsg = msg instanceof Error
+                ? `> ${msg.name}: ${msg.message}`
+                : `> ${msg}`;
 
-        const newLogMsgData = Object.assign({}, logMsgData);
-        newLogMsgData[newLogKey] = newLogMsg;
+            const newLogMsgData = Object.assign({}, logMsgData);
+            newLogMsgData[newLogMsgKey] = newLogMsg;
 
-        console.log(`newLogMsgData: ${JSON.stringify(newLogMsgData)}`);
-
-        this.setState({
-            logMsgData: newLogMsgData,
-        });
+            this.setState(prevState => ({
+                logMsgData: newLogMsgData,
+                logMsgKeys: [...prevState.logMsgKeys, newLogMsgKey],
+            }));
+        }
     };
 
     handleBoardClick = (e: SyntheticMouseEvent<HTMLDivElement>) => {
-        const clickedEl = (e.target: HTMLDivElement);  // Flow type casting
+        const clickedEl = e.target;  // Flow type casting
         if (!elHasClass(clickedEl, 'todo-create-new') && !elChildOfClass(clickedEl, 'todo-create-new')) {
+            // If user clicks outside of <TodoCreateNew />, reset the component and save new data
             this.setState(prevState => ({
                 todoCreateNewKey: !prevState.todoCreateNewKey,
             }));
@@ -80,8 +97,7 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
     };
 
     render() {
-        const {logMsgData, tdKeys, todoCreateNewKey} = this.state;
-        const logMsgKeys = Object.keys(logMsgData);
+        const {logMsgData, logMsgKeys, tdKeys, todoCreateNewKey} = this.state;
 
         const logMsgEls = logMsgKeys.map(logMsgKey => (
             <LogMessage key={logMsgKey} msg={logMsgData[logMsgKey]} />
@@ -99,7 +115,7 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
                         {logMsgEls}
                     </div>
                     <div className="todo-board-title">To-do tracker</div>
-                    <TodoCreateNew key={todoCreateNewKey.toString()} logger={this.logNewMsg} />
+                    <TodoCreateNew key={todoCreateNewKey.toString()} logger={this.logNewMsg} dbSync={this.syncWithDb} />
                 </section>
                 <section className="todo-cards">
                     {tdCards.length > 0 ? tdCards : <EmptyBoard />}
