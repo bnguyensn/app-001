@@ -1,9 +1,26 @@
+* {
+    box-sizing: border-box;
+}
+
 html {
     font-size: 24px;
 }
 
 body {
+    min-width: 320px;
     margin: 0;
     padding: 0;
     font-family: sans-serif;
+}
+
+@media only screen and (max-width: 640px) {
+    html {
+        font-size: 20px;
+    }
+}
+
+@media only screen and (min-width: 640px) {
+    html {
+        font-size: 24px;
+    }
 }

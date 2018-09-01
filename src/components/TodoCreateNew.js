@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Checkbox from './Checkbox';
 import TextEdit from './TextEdit';
+import MaterialIcon from './MaterialIcon';
 
 import {addTodo, addTodoListItem} from '../api/indexedDB/addItemsIDB';
 
@@ -12,22 +13,40 @@ type TDLIProps = {
     tdliDesc: string,
     handleTdliDoneChange: (tdliKey: string, newValue: boolean) => void,
     handleTdliDescInput: (tdliKey: string, newValue: string, textEditEl: Node) => void,
+    lastItem: boolean,
 };
 
 function TDLI(props: TDLIProps) {
-    const {tdliKey, tdliDone, tdliDesc, handleTdliDoneChange, handleTdliDescInput} = props;
+    const {
+        tdliKey, tdliDone, tdliDesc,
+        handleTdliDoneChange, handleTdliDescInput,
+        lastItem,
+    } = props;
 
     return (
-        <li className="todo-create-new-list-item">
-            <div className="todo-create-new-list-item-checkbox">
+        <li className="todo-edit-list-item">
+            {!lastItem
+                ? (
+                    <MaterialIcon className="todo-edit-list-item-dragger md-dark"
+                                  icon="drag_indicator" />
+                )
+                : <div style={{width: '1rem', height: '1rem'}} />
+            }
+            <div className="todo-edit-list-item-checkbox">
                 <Checkbox elKey={tdliKey}
                           checked={tdliDone}
                           handleChange={handleTdliDoneChange} />
             </div>
             <TextEdit elKey={tdliKey}
-                      className="todo-create-new-list-item-description"
+                      className="todo-edit-list-item-description"
                       initText={tdliDesc}
                       handleInput={handleTdliDescInput} />
+            {!lastItem
+                ? (
+                    <MaterialIcon className="todo-edit-list-item-deleter md-dark"
+                                  icon="cancel" />)
+                : <div style={{width: '1rem', height: '1rem'}} />
+            }
         </li>
     )
 }
@@ -205,7 +224,7 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
     render() {
         const {tdliKeys} = this.state;
 
-        const tdlis = tdliKeys.map((tdliKey) => {
+        const tdlis = tdliKeys.map((tdliKey, index) => {
             const tdliDone = this.tdliValues[tdliKey].done;
             const tdliDesc = this.tdliValues[tdliKey].desc;
 
@@ -215,16 +234,17 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
                       tdliDone={tdliDone}
                       tdliDesc={tdliDesc}
                       handleTdliDoneChange={this.handleTdliDoneChange}
-                      handleTdliDescInput={this.handleTdliDescInput} />
+                      handleTdliDescInput={this.handleTdliDescInput}
+                      lastItem={index === tdliKeys.length - 1} />
             )
         });
 
         return (
             <div className="todo-create-new">
-                <TextEdit className="todo-create-new-title"
+                <TextEdit className="todo-edit-title"
                           elKey="tdcnTitle"
                           handleInput={this.handleTdTitleInput} />
-                <ul className="todo-create-new-list-items">
+                <ul className="todo-edit-list-items">
                     {tdlis}
                 </ul>
             </div>

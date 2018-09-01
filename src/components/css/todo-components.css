@@ -173,15 +173,9 @@
     text-align: left;
 }
 
-.todo-edit-title:empty:before {
-    content: attr(placeholder);
-    color: #9E9E9E;
-    cursor: text;
-}
-
 /** ********** List of items ********** **/
 
-.todo-list-items {
+.todo-edit-list-items {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -190,7 +184,7 @@
 
 /** ********** Options panel container ********** **/
 
-.todo-card-options-panel {
+.todo-edit-options-panel {
     display: flex;
     justify-content: flex-start;
     padding: .5rem;
@@ -198,63 +192,63 @@
 
 /** ********** Options panel buttons ********** **/
 
-.todo-card-options-panel-btn {
+.todo-edit-options-panel-btn {
     padding: 0 .25rem;
     font-size: 1.5rem;
     cursor: pointer;
 }
 
-/** ********** ********* ********** **/
-/** ********** LIST ITEM ********** **/
-/** ********** ********* ********** **/
+/** ********** ******************** ********** **/
+/** ********** TO-DO EDIT LIST ITEM ********** **/
+/** ********** ******************** ********** **/
 
 /** ********** Container & Generic children rules ********** **/
 
-.todo-list-item {
+.todo-edit-list-item {
     display: flex;
     align-items: center;
 
     margin: .5rem 0;
 }
 
-.todo-list-item:focus-within {
+.todo-edit-list-item:focus-within {
     outline: 1px solid #9E9E9E;
 }
 
-.todo-list-item > * {
+.todo-edit-list-item > * {
     margin: 0 .5rem;
 }
 
 /** ********** Dragger & Deleter ********** **/
 
-.todo-list-item-dragger, .todo-list-item-deleter {
+.todo-edit-list-item-dragger, .todo-edit-list-item-deleter {
     visibility: hidden;
 }
 
-.todo-list-item-dragger {
+.todo-edit-list-item-dragger {
     cursor: grab;
 }
 
-.todo-list-item-deleter {
+.todo-edit-list-item-deleter {
     cursor: pointer;
 }
 
-.todo-list-item:hover .todo-list-item-dragger,
-.todo-list-item:hover .todo-list-item-deleter,
-.todo-list-item:focus-within .todo-list-item-deleter {
+.todo-edit-list-item:hover .todo-edit-list-item-dragger,
+.todo-edit-list-item:hover .todo-edit-list-item-deleter,
+.todo-edit-list-item:focus-within .todo-edit-list-item-deleter {
     visibility: visible;
 }
 
 /** ********** Checkbox ********** **/
 
-.todo-list-item-checkbox {
+.todo-edit-list-item-checkbox {
     display: flex;
     align-items: center;
 }
 
 /** ********** Description (text) ********** **/
 
-.todo-list-item-description {
+.todo-edit-list-item-description {
     flex-grow: 1;
 
     white-space: pre-wrap;
@@ -263,12 +257,6 @@
     overflow-wrap: break-word;
 }
 
-.todo-list-item-description:focus {
+.todo-edit-list-item-description:focus {
     outline: none;
-}
-
-.todo-list-item-description:empty:before {
-    content: attr(placeholder);
-    color: #9E9E9E;
-    cursor: text;
 }
