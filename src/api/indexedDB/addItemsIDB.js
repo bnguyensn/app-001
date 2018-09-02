@@ -105,10 +105,19 @@ async function addTodo(todo) {
 async function putTodo(todo, putKey = undefined) {
     try {
         // Make sure the item(s) being added is/are in conformity with our database
-        const itemToAdd = Array.isArray(todo)
-            ? todo.map(td => ({title: td.title}))
-            : {title: todo.title};
+        let itemToAdd;
 
+        if (Array.isArray(todo)) {
+            itemToAdd = todo.map(td => ({
+                title: td.title,
+                color: td.color,
+            }));
+        } else {
+            itemToAdd = {
+                title: todo.title,
+                color: todo.color,
+            };
+        }
         return await add('todos', itemToAdd, true, putKey)
     } catch (e) {
         throw e

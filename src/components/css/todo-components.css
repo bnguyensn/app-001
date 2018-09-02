@@ -11,7 +11,7 @@
     max-width: 100%;
 }
 
-.todo-board * {
+.todo-board > * {
     max-width: 100%;
 }
 
@@ -21,6 +21,10 @@
     display: flex;
     align-items: center;
     flex-direction: column;
+}
+
+.todo-board-top-control > * {
+    max-width: 100%;
 }
 
 /** ********** Logs ********** **/
@@ -180,22 +184,6 @@
     padding: 0;
     list-style: none;
     text-align: left;
-}
-
-/** ********** Options panel container ********** **/
-
-.todo-edit-options-panel {
-    display: flex;
-    justify-content: flex-start;
-    padding: .5rem;
-}
-
-/** ********** Options panel buttons ********** **/
-
-.todo-edit-options-panel-btn {
-    padding: 0 .25rem;
-    font-size: 1.5rem;
-    cursor: pointer;
 }
 
 /** ********** ******************** ********** **/

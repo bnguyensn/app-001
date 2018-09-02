@@ -1,6 +1,8 @@
 // @flow
 
 import * as React from 'react';
+import OptionsPanel from './OptionsPanel';
+
 import {getTodo, getAllTodoListItems} from '../api/indexedDB/readIDB';
 
 function EmptyCard() {
@@ -20,7 +22,7 @@ function TDLI(props: TDLIProps) {
     return (
         <li className="todo-card-list-item">
             <div className="todo-card-list-item-checkbox">
-                <input type="checkbox" checked={tdliDone} />
+                <input type="checkbox" defaultChecked={tdliDone} />
             </div>
             <div className="todo-card-list-item-description">
                 {tdliDesc}
@@ -32,6 +34,7 @@ function TDLI(props: TDLIProps) {
 type TodoCardProps = {
     tdKey: string,
     logNewMsg: (msg: string) => void,
+    removeTodo: (todoId: string) => Promise<string>,
 };
 
 type TodoCardStates = {
@@ -85,6 +88,7 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
     };
 
     render() {
+        const {tdKey, removeTodo} = this.props;
         const {tdTitle, tdliKeys, tdliValues} = this.state;
 
         const tdlis = tdliKeys.map((tdliKey) => {
@@ -102,6 +106,7 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
                 <ul className="todo-card-list-items">
                     {tdlis.length > 0 ? tdlis : <EmptyCard />}
                 </ul>
+                <OptionsPanel todoId={tdKey} removeTodo={removeTodo} />
             </div>
         )
     }

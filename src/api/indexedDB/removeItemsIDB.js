@@ -21,10 +21,42 @@ async function removeItem(objStoreName, key) {
 
 async function removeItemByIndex(objStoreName, indexName, indexKey) {
     try {
-        // Only delete if indexName / indexKey exists
+        const trans = await createTransaction(objStoreName, 'readwrite');
+        const objStore = trans.objectStore(objStoreName);
+        const index = objStore.index(indexName);
 
+        const req = index.openCursor(indexKey);
+
+        return new Promise((resolve, reject) => {
+            let count = 0;
+
+            req.onerror = () => {
+                reject(req.error);
+            };
+            req.onsuccess = () => {
+                const cursor = req.result;
+
+                if (cursor) {
+                    count += 1;
+                    console.log(`Found item #${count}: [${cursor.primaryKey}, ${JSON.stringify(cursor.value)}].`);
+
+                    const delReq = cursor.delete();
+                    delReq.onsuccess = () => {
+                        console.log(`Successfully deleted item #${count}: id ${cursor.primaryKey}`);
+                    };
+                    delReq.onerror = () => {
+                        console.log(`Could not delete item #${count}: id ${cursor.primaryKey}. Error: ${delReq.error}`);
+                    };
+
+                    cursor.continue();
+                } else {
+                    resolve('removeItemByIndex finished.');
+                    console.log(`All ${count} cursor item(s) have been iterated through.`);
+                }
+            };
+        })
     } catch (e) {
-
+        throw e
     }
 }
 
@@ -34,7 +66,14 @@ async function removeTodo(todoId) {
     try {
         // todoId should be a number
         const sanitizedTodoId = sanitizeNumber(todoId);
-        await removeItem('todos', sanitizedTodoId);
+
+        const tdPromise = removeItem('todos', sanitizedTodoId);
+        const tdliPromise = removeItemByIndex('todoListItems', 'todoId', todoId);
+
+        const tdRemoveRes = await tdPromise;
+        const tdliRemoveRes = await tdliPromise;
+
+        return {tdRemoveRes, tdliRemoveRes}
     } catch (e) {
         throw e
     }
@@ -44,7 +83,7 @@ async function removeTodoListItem(todoListItemId) {
     try {
         // todoListItemId should be a number
         const sanitizedTodoListItemId = sanitizeNumber(todoListItemId);
-        await removeItem('todosListItems', sanitizedTodoListItemId);
+        await removeItem('todoListItems', sanitizedTodoListItemId);
     } catch (e) {
         throw e
     }

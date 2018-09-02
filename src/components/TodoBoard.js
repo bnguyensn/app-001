@@ -1,11 +1,15 @@
 // @flow
 
 import * as React from 'react';
-import {getAllTodoKeys} from '../api/indexedDB/readIDB';
 import TodoCreateNew from './TodoCreateNew';
 import TodoCard from './TodoCard';
-import './css/todo-components.css';
+
 import {elHasClass, elChildOfClass} from '../utils/classes';
+
+import {getAllTodoKeys} from '../api/indexedDB/readIDB';
+import {removeTodo} from '../api/indexedDB/removeItemsIDB';
+
+import './css/todo-components.css';
 
 function EmptyBoard() {
     return (
@@ -54,18 +58,6 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         }
     }
 
-    syncWithDb = async () => {
-        try {
-            const tdKeys = await getAllTodoKeys();
-            this.setState({
-                tdKeys,
-            });
-            return 'TodoBoard synchronised with database.'
-        } catch (e) {
-            return e
-        }
-    };
-
     logNewMsg = (msg: string | Error) => {
         if (msg) {
             const {logMsgData} = this.state;
@@ -86,6 +78,34 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         }
     };
 
+    syncWithDb = async () => {
+        try {
+            const tdKeys = await getAllTodoKeys();
+            this.setState({
+                tdKeys,
+            });
+            return 'TodoBoard synchronised with database.'
+        } catch (e) {
+            return e
+        }
+    };
+
+    removeTodo = async (todoId: string): Promise<string> => {
+        try {
+            const resRemove = await removeTodo(todoId);
+            this.logNewMsg(resRemove.tdRemoveRes);
+            this.logNewMsg(resRemove.tdliRemoveRes);
+
+            const resSync = await this.syncWithDb();
+            this.logNewMsg(resSync);
+
+            return 'To-do removal complete'
+        } catch (e) {
+            this.logNewMsg(e);
+            throw e
+        }
+    };
+
     handleBoardClick = (e: SyntheticMouseEvent<HTMLDivElement>) => {
         const clickedEl = e.target;  // Flow type casting
         if (!elHasClass(clickedEl, 'todo-create-new') && !elChildOfClass(clickedEl, 'todo-create-new')) {
@@ -103,7 +123,10 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
             <LogMessage key={logMsgKey} msg={logMsgData[logMsgKey]} />
         ));
         const tdCards = tdKeys.map(tdKey => (
-            <TodoCard key={tdKey} tdKey={tdKey} logNewMsg={this.logNewMsg} />
+            <TodoCard key={tdKey}
+                      tdKey={tdKey}
+                      logNewMsg={this.logNewMsg}
+                      removeTodo={this.removeTodo} />
         ));
 
         return (
