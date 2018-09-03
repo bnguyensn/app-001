@@ -107,13 +107,20 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
     };
 
     handleBoardClick = (e: SyntheticMouseEvent<HTMLDivElement>) => {
-        const clickedEl = e.target;  // Flow type casting
+        const clickedEl = e.target;
         if (!elHasClass(clickedEl, 'todo-create-new') && !elChildOfClass(clickedEl, 'todo-create-new')) {
-            // If user clicks outside of <TodoCreateNew />, reset the component and save new data
-            this.setState(prevState => ({
-                todoCreateNewKey: !prevState.todoCreateNewKey,
-            }));
+            // If user clicks outside of <TodoCreateNew />, reset the component
+            // and save new data
+            // Data saving logic is handled in <TodoCreateNew />'s unmounting
+            // lifecycle. The function below only triggers the unmounting
+            this.resetTodoCreateNew();
         }
+    };
+
+    resetTodoCreateNew = () => {
+        this.setState(prevState => ({
+            todoCreateNewKey: !prevState.todoCreateNewKey,
+        }));
     };
 
     render() {
@@ -138,7 +145,10 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
                         {logMsgEls}
                     </div>
                     <div className="todo-board-title">To-do tracker</div>
-                    <TodoCreateNew key={todoCreateNewKey.toString()} logger={this.logNewMsg} dbSync={this.syncWithDb} />
+                    <TodoCreateNew key={todoCreateNewKey.toString()}
+                                   logger={this.logNewMsg}
+                                   dbSync={this.syncWithDb}
+                                   reset={this.resetTodoCreateNew} />
                 </section>
                 <section className="todo-cards">
                     {tdCards.length > 0 ? tdCards : <EmptyBoard />}

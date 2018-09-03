@@ -25,6 +25,10 @@
     opacity: 1;
 }
 
+.todo-options-panel-btn:focus {
+    outline: none;
+}
+
 /** ********** Options panel button tooltips ********** **/
 
 .todo-options-panel-btn-tooltip {

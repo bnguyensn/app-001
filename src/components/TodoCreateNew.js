@@ -6,6 +6,7 @@ import TextEdit from './TextEdit';
 import MaterialIcon from './MaterialIcon';
 
 import {addTodo, addTodoListItem} from '../api/indexedDB/addItemsIDB';
+import OptionsPanel from './OptionsPanel';
 
 type TDLIProps = {
     tdliKey: string,
@@ -54,6 +55,7 @@ function TDLI(props: TDLIProps) {
 type TodoCreateNewProps = {
     logger?: (msg: string) => void,
     dbSync: () => Promise<string>,
+    reset: () => void,
 };
 
 type TodoCreateNewStates = {
@@ -64,12 +66,14 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
     tdTitle: string;
     tdliValues: {};  // Structure: {tdliKeyX: {done: x, desc: x}, ...}
     keysCount: number;
+    forceResetNoSave: boolean;  // See method resetSelf()
 
     constructor(props: TodoCreateNewProps) {
         super(props);
         this.tdTitle = '';
         this.tdliValues = {};
         this.keysCount = 0;
+        this.forceResetNoSave = false;
 
         const initialTdliKey = this.getNewKey();
         this.tdliValues[initialTdliKey] = {
@@ -85,22 +89,32 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
     async componentWillUnmount() {
         const {logger, dbSync} = this.props;
 
-        const resAddNewData = await this.saveTdToDB();
-        if (logger) {
-            if (resAddNewData instanceof Error) {
-                logger(resAddNewData);
-            } else {
-                logger(resAddNewData.msg);
-            }
-        }
-
-        if (Object.entries(resAddNewData.data).length !== 0 || resAddNewData instanceof Error) {
-            const resDbSync = await dbSync();
+        if (!this.forceResetNoSave) {
+            const resAddNewData = await this.saveTdToDB();
             if (logger) {
-                logger(resDbSync);
+                if (resAddNewData instanceof Error) {
+                    logger(resAddNewData);
+                } else {
+                    logger(resAddNewData.msg);
+                }
+            }
+
+            if (Object.entries(resAddNewData.data).length !== 0
+                || resAddNewData instanceof Error) {
+                const resDbSync = await dbSync();
+                if (logger) {
+                    logger(resDbSync);
+                }
             }
         }
     }
+
+    resetSelf = () => {
+        const {reset} = this.props;
+
+        this.forceResetNoSave = true;
+        reset();
+    };
 
     getNewKey = (): string => {
         const key = `key${this.keysCount}`;
@@ -247,6 +261,7 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
                 <ul className="todo-edit-list-items">
                     {tdlis}
                 </ul>
+                <OptionsPanel todoId="" removeTodo={this.resetSelf} />
             </div>
         )
     }

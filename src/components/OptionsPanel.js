@@ -23,7 +23,6 @@ class ColorPalette extends React.PureComponent<{hiding: boolean}, {}> {
     constructor(props: {hiding: boolean}) {
         super(props);
         const colors = Object.keys(COLORS);
-        console.log(colors);
         this.colorButtons = colors.map(color => (
             <ColorButton key={color} color={COLORS[color]} />
         ));
@@ -94,7 +93,7 @@ function OptionsPanelButton(props: OptionsPanelButtonProps) {
 
 type OptionsPanelProps = {
     todoId: string,
-    removeTodo: (todoId: string) => Promise<string>,
+    removeTodo: (todoId?: string) => Promise<string> | void,
 };
 
 type OptionsPanelStates = {
@@ -112,7 +111,12 @@ export default class OptionsPanel extends React.PureComponent<OptionsPanelProps,
     handleDeleteClick = () => {
         const {todoId, removeTodo} = this.props;
 
-        removeTodo(todoId);
+        if (todoId) {
+            removeTodo(todoId);
+        } else {
+            removeTodo();
+        }
+
     };
 
     handleChangeColorClick = () => {
