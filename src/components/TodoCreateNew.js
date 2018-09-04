@@ -59,6 +59,7 @@ type TodoCreateNewProps = {
 };
 
 type TodoCreateNewStates = {
+    tdColor: string,
     tdliKeys: string[],
 };
 
@@ -82,6 +83,7 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         };
 
         this.state = {
+            tdColor: '#EEEEEE',
             tdliKeys: [initialTdliKey],
         };
     }
@@ -133,6 +135,12 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         this.tdTitle = newValue;
     };
 
+    handleTdColorChange = (key: string, newValue: string) => {
+        this.setState({
+            tdColor: newValue,
+        });
+    };
+
     handleTdliDoneChange = (tdliKey: string, newValue: boolean) => {
         this.tdliValues[tdliKey].done = newValue;
     };
@@ -179,7 +187,7 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
                 }
             }
 
-            const {tdliKeys} = this.state;
+            const {tdliKeys, tdColor} = this.state;
 
             if (this.checkEmptyTdliValues()) {
                 if (this.checkEmptyTdTitle()) {
@@ -193,7 +201,10 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
 
                 // TD data exists, but no TDLI
 
-                const tdToAdd = {title: this.tdTitle};
+                const tdToAdd = {
+                    title: this.tdTitle,
+                    color: tdColor,
+                };
                 const addedTdKey = (await addTodo(tdToAdd)).data;
 
                 return {
@@ -207,7 +218,10 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
 
             // TDLI data exists, doesn't matter whether TD data exists
 
-            const tdToAdd = {title: this.tdTitle};
+            const tdToAdd = {
+                title: this.tdTitle,
+                color: tdColor,
+            };
             const addedTdKey = (await addTodo(tdToAdd)).data;
 
             const tdlisToAdd = tdliKeys.reduce((res, tdliKey, index) => {
@@ -236,7 +250,7 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
     };
 
     render() {
-        const {tdliKeys} = this.state;
+        const {tdliKeys, tdColor} = this.state;
 
         const tdlis = tdliKeys.map((tdliKey, index) => {
             const tdliDone = this.tdliValues[tdliKey].done;
@@ -254,14 +268,17 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         });
 
         return (
-            <div className="todo-create-new">
+            <div className="todo-create-new"
+                 style={{backgroundColor: tdColor}}>
                 <TextEdit className="todo-edit-title"
                           elKey="tdcnTitle"
                           handleInput={this.handleTdTitleInput} />
                 <ul className="todo-edit-list-items">
                     {tdlis}
                 </ul>
-                <OptionsPanel todoId="" removeTodo={this.resetSelf} />
+                <OptionsPanel todoId=""
+                              removeTodo={this.resetSelf}
+                              changeColor={this.handleTdColorChange} />
             </div>
         )
     }

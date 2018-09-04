@@ -90,8 +90,14 @@ async function addTodo(todo) {
     try {
         // Make sure the item(s) being added is/are in conformity with our database
         const itemToAdd = Array.isArray(todo)
-            ? todo.map(td => ({title: td.title}))
-            : {title: todo.title};
+            ? todo.map(td => ({
+                title: td.title,
+                color: td.color,
+            }))
+            : {
+                title: todo.title,
+                color: todo.color,
+            };
 
         return await add('todos', itemToAdd)
     } catch (e) {
@@ -101,6 +107,9 @@ async function addTodo(todo) {
 
 /**
  * Could put a single or an array of todos
+ * @param {Object} todo - Could be a todo object or an array of todo objects
+ * @param {string} putKey - If this is passed, the put() function will update
+ * the database record at key putKey. Otherwise a new record is added
  * */
 async function putTodo(todo, putKey = undefined) {
     try {

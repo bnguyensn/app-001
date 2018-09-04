@@ -8,23 +8,48 @@ import './css/options-panel.css';
 
 /** ********** OPTIONS PANEL COLOR PALETTE ********** **/
 
-function ColorButton(props: {color: string}) {
-    const {color} = props;
+type ColorButtonProps = {
+    color: string,
+    changeColor: (newValue: string) => void,
+};
+
+function ColorButton(props: ColorButtonProps) {
+    const {color, changeColor} = props;
+
+    const click = () => {
+        changeColor(color);
+    };
+
+    const keyPress = (e: SyntheticKeyboardEvent<>) => {
+        if (e.key === 'Enter') {
+            click();
+        }
+    };
 
     return (
         <div className="todo-options-panel-color-palette-btn"
-             style={{backgroundColor: color}} />
+             role="button" tabIndex={0}
+             style={{backgroundColor: color}}
+             onClick={click}
+             onKeyPress={keyPress} />
     )
 }
 
-class ColorPalette extends React.PureComponent<{hiding: boolean}, {}> {
+type ColorPaletteProps = {
+    hiding: boolean,
+    changeColor: (newValue: string) => void,
+};
+
+class ColorPalette extends React.PureComponent<ColorPaletteProps, {}> {
     colorButtons: React.Node[];
 
-    constructor(props: {hiding: boolean}) {
+    constructor(props: ColorPaletteProps) {
         super(props);
         const colors = Object.keys(COLORS);
         this.colorButtons = colors.map(color => (
-            <ColorButton key={color} color={COLORS[color]} />
+            <ColorButton key={color}
+                         color={COLORS[color]}
+                         changeColor={props.changeColor} />
         ));
     }
 
@@ -93,7 +118,8 @@ function OptionsPanelButton(props: OptionsPanelButtonProps) {
 
 type OptionsPanelProps = {
     todoId: string,
-    removeTodo: (todoId?: string) => Promise<string> | void,
+    removeTodo: (todoId: string) => Promise<string> | void,
+    changeColor: (todoId: string, newValue: string) => Promise<void> | void,
 };
 
 type OptionsPanelStates = {
@@ -108,21 +134,21 @@ export default class OptionsPanel extends React.PureComponent<OptionsPanelProps,
         };
     }
 
-    handleDeleteClick = () => {
+    handleDelete = () => {
         const {todoId, removeTodo} = this.props;
-
-        if (todoId) {
-            removeTodo(todoId);
-        } else {
-            removeTodo();
-        }
-
+        removeTodo(todoId);
     };
 
-    handleChangeColorClick = () => {
+    handleOpenColorPalette = () => {
         this.setState(prevState => ({
             colorPaletteHiding: !prevState.colorPaletteHiding,
         }));
+    };
+
+    handleChangeColor = (newValue: string) => {
+        const {todoId, changeColor} = this.props;
+        console.log('change color clicked');
+        changeColor(todoId, newValue);
     };
 
     render() {
@@ -132,11 +158,12 @@ export default class OptionsPanel extends React.PureComponent<OptionsPanelProps,
             <div className="todo-options-panel">
                 <OptionsPanelButton icon="delete"
                                     tooltipText="Delete"
-                                    handleClick={this.handleDeleteClick} />
+                                    handleClick={this.handleDelete} />
                 <OptionsPanelButton icon="color_lens"
                                     tooltipText="Change color"
-                                    handleClick={this.handleChangeColorClick}>
-                    <ColorPalette hiding={colorPaletteHiding} />
+                                    handleClick={this.handleOpenColorPalette}>
+                    <ColorPalette hiding={colorPaletteHiding}
+                                  changeColor={this.handleChangeColor} />
                 </OptionsPanelButton>
             </div>
         )
