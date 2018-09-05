@@ -3,6 +3,7 @@
 import * as React from 'react';
 import TodoCreateNew from './TodoCreateNew';
 import TodoCard from './TodoCard';
+import TodoEdit from './TodoEdit';
 
 import {elHasClass, elChildOfClass} from '../utils/classes';
 
@@ -28,7 +29,14 @@ type TodoBoardStates = {
     logMsgData: {},  // Structure: {logMsgKey: msg: x, ...}
     logMsgKeys: number[],  // Need this to display logMsgData in chronological order
     tdKeys: string[],
-    todoCreateNewKey: boolean,
+    todoCreateNewKey: boolean,  // Used to reset <TodoCreateNew />
+    todoEditData: {  // Used to populate data for <TodoEdit />
+        todoEditKey: string,
+        todoEditTitle: string,
+        todoEditColor: string,
+        todoEditTdliValues: {},
+        todoEditHidden: boolean,
+    },
 };
 
 export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> {
@@ -41,7 +49,14 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
             logMsgData: {},
             logMsgKeys: [],
             tdKeys: [],
-            todoCreateNewKey: false,  // Used to reset <TodoCreateNew />
+            todoCreateNewKey: false,
+            todoEditData: {
+                todoEditKey: '',
+                todoEditTitle: '',
+                todoEditColor: '#EEEEEE',
+                todoEditTdliValues: {},
+                todoEditHidden: true,
+            },
         };
     }
 
@@ -123,12 +138,20 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         }));
     };
 
-    render() {
-        const {logMsgData, logMsgKeys, tdKeys, todoCreateNewKey} = this.state;
+    startEdit = () => {
 
+    };
+
+    render() {
+        const {logMsgData, logMsgKeys, tdKeys, todoCreateNewKey, todoEditData} = this.state;
+        const {todoEditKey, todoEditTitle, todoEditColor, todoEditTdliValues, todoEditHidden} = todoEditData;
+
+        // Generate log message elements
         const logMsgEls = logMsgKeys.map(logMsgKey => (
             <LogMessage key={logMsgKey} msg={logMsgData[logMsgKey]} />
         ));
+
+        // Generate <TodoCard />
         const tdCards = tdKeys.map(tdKey => (
             <TodoCard key={tdKey}
                       tdKey={tdKey}
@@ -149,6 +172,13 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
                                    logger={this.logNewMsg}
                                    dbSync={this.syncWithDb}
                                    reset={this.resetTodoCreateNew} />
+                </section>
+                <section className="todo-edit-lightbox-bkg">
+                    <TodoEdit tdKey={todoEditKey}
+                              defaultTdTitle={todoEditTitle}
+                              defaultTdColor={todoEditColor}
+                              defaultTdliValues={todoEditTdliValues}
+                              hidden={todoEditHidden} />
                 </section>
                 <section className="todo-cards">
                     {tdCards.length > 0 ? tdCards : <EmptyBoard />}

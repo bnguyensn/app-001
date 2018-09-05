@@ -28,7 +28,7 @@ function ColorButton(props: ColorButtonProps) {
 
     return (
         <div className="todo-options-panel-color-palette-btn"
-             role="button" tabIndex={0}
+             role="button" tabIndex={0} aria-label={`Change color to ${color}`}
              style={{backgroundColor: color}}
              onClick={click}
              onKeyPress={keyPress} />
@@ -104,7 +104,7 @@ function OptionsPanelButton(props: OptionsPanelButtonProps) {
 
     return (
         <div className="todo-options-panel-btn"
-             role="button" tabIndex={0}
+             role="button" tabIndex={0} aria-label={icon}
              onClick={handleClick}
              onKeyPress={keyPress}>
             <MaterialIcon className="md-dark" icon={icon} />

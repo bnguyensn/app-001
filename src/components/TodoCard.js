@@ -113,6 +113,18 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         }
     };
 
+    handleClick = (e: SyntheticMouseEvent<>) => {
+
+    };
+
+    handleKeyPress = () => {
+
+    };
+
+    handleFocus = () => {
+        // Display selection circle
+    };
+
     render() {
         const {tdKey, removeTodo} = this.props;
         const {tdTitle, tdColor, tdliKeys, tdliValues} = this.state;
@@ -126,7 +138,11 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
 
         return (
             <div className="todo-card"
-                 style={{backgroundColor: tdColor}}>
+                 role="button" tabIndex={0} aria-label={`To-do #${tdKey}`}
+                 style={{backgroundColor: tdColor}}
+                 onClick={this.handleClick}
+                 onKeyPress={this.handleKeyPress}
+                 onFocus={this.handleFocus}>
                 <div className="todo-card-title">
                     {tdTitle}
                 </div>
