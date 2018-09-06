@@ -6,8 +6,6 @@ import OptionsPanel from './OptionsPanel';
 import MaterialIcon from './MaterialIcon';
 import Checkbox from './Checkbox';
 
-import './css/todo-edit.css';
-
 /** ********** LIST ITEM ********** **/
 
 type TDLIProps = {
@@ -40,7 +38,7 @@ function TDLI(props: TDLIProps) {
                           checked={tdliDone}
                           handleChange={handleTdliDoneChange} />
             </div>
-            <TextEdit textEditKey={tdliKey}
+            <TextEdit elKey={tdliKey}
                       className="todo-edit-list-item-description"
                       initText={tdliDesc}
                       handleInput={handleTdliDescInput} />
@@ -54,19 +52,28 @@ function TDLI(props: TDLIProps) {
     )
 }
 
-/** ********** TO-DO ********** **/
+/** ********** EDIT WINDOW ********** **/
 
-type TodoEditProps = {
+export type TodoEditData = {
     tdKey: string,
     tdTitle: string,
     tdColor: string,
-    tdliKeys: string[],  // Real database keys
-    tdliValues: {},  // Structure: {tdliKeyX: {done: x, desc: x}, ...}
+    tdliValues: {},  // Structure: {realTdliKeyX: {done: x, desc: x}, ...}
+    hidden: boolean,
+};
+
+type TodoEditProps = {
+    tdKey: string,
+    defaultTdTitle: string,
+    defaultTdColor: string,
+    defaultTdliValues: {},  // Structure: {realTdliKeyX: {done: x, desc: x}, ...}
+    hidden: boolean,
+    stopEdit: () => void,
 };
 
 type TodoEditStates = {
-    tdColorState: string,
-    tdliKeysState: string[],  // Fake instance keys
+    tdColor: string,
+    tdliKeys: string[],
 };
 
 export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEditStates> {
@@ -76,29 +83,32 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
 
     constructor(props: TodoEditProps) {
         super(props);
-        this.tdTitle = props.tdTitle;
+        this.tdTitle = props.defaultTdTitle;
         this.tdliValues = {};
         this.keysCount = 0;
 
-        // Initialise tdliValues with data received from props
-        props.tdliKeys.forEach((tdliKey) => {
-            const {done, desc} = props.tdliValues[tdliKey];
+        // Initialise tdliValues with existing database data
+        const defaultTdliKeys = Object.keys(props.defaultTdliValues);
+        defaultTdliKeys.forEach((tdliKey) => {
+            const {done, desc} = props.defaultTdliValues[tdliKey];
             const fakeTdliKey = this.getNewKey();
 
             this.tdliValues[fakeTdliKey] = {tdliKey, done, desc};
         });
 
         // Add the empty "create new" TDLI
-        this.tdliValues[this.getNewKey()] = {
+        const fakeTdliKey = `key${this.keysCount}`;
+        this.tdliValues[fakeTdliKey] = {
             tdliKey: '',
             done: false,
             desc: '',
         };
+        this.keysCount += 1;
 
         // Update state
         this.state = {
-            tdColorState: props.tdColor,
-            tdliKeysState: Object.keys(this.tdliValues),
+            tdColor: props.defaultTdColor,
+            tdliKeys: Object.keys(this.tdliValues),
         };
     }
 
@@ -136,8 +146,12 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
             desc: '',
         };
         this.setState(prevState => ({
-            tdliKeysState: [...prevState.tdliKeysState, newTdliKey],
+            tdliKeys: [...prevState.tdliKeys, newTdliKey],
         }));
+    };
+
+    handleTodoEditClick = (e: SyntheticKeyboardEvent<>) => {
+        e.stopPropagation();
     };
 
     /** ********** INPUT HANDLING ********** **
@@ -152,7 +166,7 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
 
     handleTdColorChange = (key: string, newValue: string) => {
         this.setState({
-            tdColorState: newValue,
+            tdColor: newValue,
         });
     };
 
@@ -179,36 +193,41 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
     /** ********** RENDER ********** **/
 
     render() {
-        const {tdKey} = this.props;
-        const {tdColorState, tdliKeysState} = this.state;
+        const {tdKey, hidden, stopEdit} = this.props;
+        const {tdColor, tdliKeys} = this.state;
 
         // Generate TDLIs
-        const tdlis = tdliKeysState.map((fakeTdliKey, index) => {
-            const {tdliKey, tdliDone, tdliDesc} = this.tdliValues[fakeTdliKey];
+        const tdlis = tdliKeys.map((tdliKey, index) => {
+            const tdliDone = this.tdliValues[tdliKey].done;
+            const tdliDesc = this.tdliValues[tdliKey].desc;
 
             return (
-                <TDLI key={fakeTdliKey}
+                <TDLI key={tdliKey}
                       tdliKey={tdliKey}
                       tdliDone={tdliDone}
                       tdliDesc={tdliDesc}
                       handleTdliDoneChange={this.handleTdliDoneChange}
                       handleTdliDescInput={this.handleTdliDescInput}
-                      lastItem={index === tdliKeysState.length - 1} />
+                      lastItem={index === tdliKeys.length - 1} />
             )
         });
 
         return (
-            <div className="todo-edit"
-                 style={{backgroundColor: tdColorState}}>
-                <TextEdit className="todo-edit-title"
-                          textEditKey={tdKey}
-                          handleInput={this.handleTdTitleInput} />
-                <ul className="todo-edit-list-items">
-                    {tdlis}
-                </ul>
-                <OptionsPanel todoId=""
-                              removeTodo={this.resetSelf}
-                              changeColor={this.handleTdColorChange} />
+            <div className={`todo-edit-lightbox-bkg ${hidden ? 'hidden' : ''}`}
+                 onClick={stopEdit}>
+                <div className={`todo-edit ${hidden ? 'hidden' : ''}`}
+                     style={{backgroundColor: tdColor}}
+                     onClick={this.handleTodoEditClick}>
+                    <TextEdit className="todo-edit-title"
+                              elKey={tdKey}
+                              handleInput={this.handleTdTitleInput} />
+                    <ul className="todo-edit-list-items">
+                        {tdlis}
+                    </ul>
+                    <OptionsPanel todoId=""
+                                  removeTodo={this.resetSelf}
+                                  changeColor={this.handleTdColorChange} />
+                </div>
             </div>
         )
     }

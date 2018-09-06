@@ -7,7 +7,7 @@ type TextEditProps = {
     id?: string,
     className?: string,
     placeholder?: string,
-    elKey?: string,
+    textEditKey?: string,
     initText?: string,
     handleInput?: (key: string, newValue: string, textEditEL: Node) => void,
     handleBlur?: (key: string, curValue: string) => void,
@@ -29,17 +29,17 @@ export default class TextEdit extends React.PureComponent<TextEditProps, {}> {
     }
 
     handleInput = (e: SyntheticInputEvent<HTMLDivElement>) => {
-        const {elKey, handleInput} = this.props;
-        if (elKey && handleInput) {
-            const key = elKey || '';
+        const {textEditKey, handleInput} = this.props;
+        if (textEditKey && handleInput) {
+            const key = textEditKey || '';
             handleInput(key, e.currentTarget.textContent, e.currentTarget);
         }
     };
 
     handleBlur = (e: SyntheticInputEvent<HTMLDivElement>) => {
-        const {elKey, handleBlur} = this.props;
+        const {textEditKey, handleBlur} = this.props;
         if (handleBlur) {
-            const key = elKey || '';
+            const key = textEditKey || '';
             handleBlur(key, e.currentTarget.textContent);
         }
     };

@@ -1,0 +1,104 @@
+/** ********** ********** ********** **/
+/** ********** TO-DO EDIT ********** **/
+/** ********** ********** ********** **/
+
+/** ********** Container & Generic children rules ********** **/
+
+.todo-edit {
+    display: flex;
+    flex-direction: column;
+
+    margin: .5rem;
+    width: 25rem;
+    border: 1px solid #757575;
+
+    box-shadow: 0 4px 8px #757575;
+}
+
+.todo-edit.hidden {
+    display: none;
+}
+
+.todo-edit.hidden-vis {
+    visibility: hidden;
+}
+
+/** ********** Title ********** **/
+
+.todo-edit-title {
+    padding: .5rem;
+    font-size: 1.1rem;
+    text-align: left;
+}
+
+/** ********** List of items ********** **/
+
+.todo-edit-list-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+/** ********** ******************** ********** **/
+/** ********** TO-DO EDIT LIST ITEM ********** **/
+/** ********** ******************** ********** **/
+
+/** ********** Container & Generic children rules ********** **/
+
+.todo-edit-list-item {
+    display: flex;
+    align-items: center;
+
+    margin: .5rem 0;
+}
+
+.todo-edit-list-item:focus-within {
+    outline: 1px solid #9E9E9E;
+}
+
+.todo-edit-list-item > * {
+    margin: 0 .5rem;
+}
+
+/** ********** Dragger & Deleter ********** **/
+
+.todo-edit-list-item-dragger, .todo-edit-list-item-deleter {
+    visibility: hidden;
+}
+
+.todo-edit-list-item-dragger {
+    cursor: grab;
+}
+
+.todo-edit-list-item-deleter {
+    cursor: pointer;
+}
+
+.todo-edit-list-item:hover .todo-edit-list-item-dragger,
+.todo-edit-list-item:hover .todo-edit-list-item-deleter,
+.todo-edit-list-item:focus-within .todo-edit-list-item-deleter {
+    visibility: visible;
+}
+
+/** ********** Checkbox ********** **/
+
+.todo-edit-list-item-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+/** ********** Description (text) ********** **/
+
+.todo-edit-list-item-description {
+    flex-grow: 1;
+
+    white-space: pre-wrap;
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.todo-edit-list-item-description:focus {
+    outline: none;
+}
