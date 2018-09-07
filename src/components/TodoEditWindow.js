@@ -38,7 +38,7 @@ function TDLI(props: TDLIProps) {
                           checked={tdliDone}
                           handleChange={handleTdliDoneChange} />
             </div>
-            <TextEdit elKey={tdliKey}
+            <TextEdit textEditKey={tdliKey}
                       className="todo-edit-list-item-description"
                       initText={tdliDesc}
                       handleInput={handleTdliDescInput} />
@@ -76,14 +76,14 @@ type TodoEditStates = {
     tdliKeys: string[],
 };
 
-export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEditStates> {
+export default class TodoEditWindow extends React.PureComponent<TodoEditProps, TodoEditStates> {
     tdTitle: string;
     tdliValues: {};  // Structure: {fakeTdliKeyX: {tdliKey: x, done: x, desc: x}, ...}
     keysCount: number;
 
     constructor(props: TodoEditProps) {
         super(props);
-        this.tdTitle = props.defaultTdTitle;
+        this.tdTitle = props.tdTitle;
         this.tdliValues = {};
         this.keysCount = 0;
 
@@ -107,7 +107,7 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
 
         // Update state
         this.state = {
-            tdColor: props.defaultTdColor,
+            tdColor: props.tdColor,
             tdliKeys: Object.keys(this.tdliValues),
         };
     }
@@ -219,7 +219,7 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
                      style={{backgroundColor: tdColor}}
                      onClick={this.handleTodoEditClick}>
                     <TextEdit className="todo-edit-title"
-                              elKey={tdKey}
+                              textEditKey={tdKey}
                               handleInput={this.handleTdTitleInput} />
                     <ul className="todo-edit-list-items">
                         {tdlis}
