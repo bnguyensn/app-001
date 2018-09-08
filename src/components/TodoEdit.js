@@ -8,7 +8,15 @@ import Checkbox from './Checkbox';
 
 import './css/todo-edit.css';
 
-/** ********** LIST ITEM ********** **/
+/** ********** TO-DO EDIT LIST ITEM BUTTON ********** **/
+
+function TDLIButton(props: {}) {
+    return (
+        <MaterialIcon role="button" tabIndex={0} {...props} />
+    )
+}
+
+/** ********** TO-DO EDIT LIST ITEM ********** **/
 
 type TDLIProps = {
     tdliKey: string,
@@ -21,8 +29,11 @@ type TDLIProps = {
 
 function TDLI(props: TDLIProps) {
     const {
-        tdliKey, tdliDone, tdliDesc,
-        handleTdliDoneChange, handleTdliDescInput,
+        tdliKey,
+        tdliDone,
+        tdliDesc,
+        handleTdliDoneChange,
+        handleTdliDescInput,
         lastItem,
     } = props;
 
@@ -30,8 +41,8 @@ function TDLI(props: TDLIProps) {
         <li className="todo-edit-list-item">
             {!lastItem
                 ? (
-                    <MaterialIcon className="todo-edit-list-item-dragger md-dark"
-                                  icon="drag_indicator" />
+                    <TDLIButton className="todo-edit-list-item-dragger md-dark"
+                                icon="drag_indicator" />
                 )
                 : <div style={{width: '1rem', height: '1rem'}} />
             }
@@ -46,22 +57,24 @@ function TDLI(props: TDLIProps) {
                       handleInput={handleTdliDescInput} />
             {!lastItem
                 ? (
-                    <MaterialIcon className="todo-edit-list-item-deleter md-dark"
-                                  icon="cancel" />)
+                    <TDLIButton className="todo-edit-list-item-deleter md-dark"
+                                icon="cancel" />)
                 : <div style={{width: '1rem', height: '1rem'}} />
             }
         </li>
     )
 }
 
-/** ********** TO-DO ********** **/
+/** ********** TO-DO EDIT ********** **/
 
-type TodoEditProps = {
+export type TodoEditProps = {
     tdKey: string,
     tdTitle: string,
     tdColor: string,
     tdliKeys: string[],  // Real database keys
-    tdliValues: {},  // Structure: {tdliKeyX: {done: x, desc: x}, ...}
+    tdliValues: {},  // Structure: {tdliKeyX: {done: x, desc: x}, ...},
+    handleRemoveTodo?: () => void,
+    handleTodoUnmount?: () => void,
 };
 
 type TodoEditStates = {
@@ -102,16 +115,26 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
         };
     }
 
-    updateSelf = () => {
+    componentWillUnmount() {
+        const {handleTodoUnmount} = this.props;
+        if (handleTodoUnmount) {
+            handleTodoUnmount();
+        } else {
+            console.log('TodoEdit unmounted but no side effects happened'
+                + ' because a handleTodoUnmount() prop was not passed.');
+        }
+    }
 
-    };
+    /** ********** SELF-DESTRUCT ********** **/
 
-    toggleSelf = () => {
-
-    };
-
-    resetSelf = () => {
-
+    handleRemoveTodo = () => {
+        const {handleRemoveTodo} = this.props;
+        if (handleRemoveTodo) {
+            handleRemoveTodo();
+        } else {
+            console.log('TodoEdit remove button was clicked but nothing'
+                + ' happened because a handleRemoveTodo() prop was not passed.');
+        }
     };
 
     /** ********** DOM HELPERS ********** **/
@@ -150,7 +173,7 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
         this.tdTitle = newValue;
     };
 
-    handleTdColorChange = (key: string, newValue: string) => {
+    handleChangeColor = (key: string, newValue: string) => {
         this.setState({
             tdColorState: newValue,
         });
@@ -170,27 +193,23 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
         }
     };
 
-    /** ********** DATABASE INTERACTIONS ********** **/
-
-    saveTdToDB = () => {
-
-    };
-
     /** ********** RENDER ********** **/
 
     render() {
-        const {tdKey} = this.props;
+        const {tdKey, tdTitle} = this.props;
         const {tdColorState, tdliKeysState} = this.state;
+
+        console.log(`TodoEdit's tdliValues: ${JSON.stringify(this.tdliValues)}`);
 
         // Generate TDLIs
         const tdlis = tdliKeysState.map((fakeTdliKey, index) => {
-            const {tdliKey, tdliDone, tdliDesc} = this.tdliValues[fakeTdliKey];
+            const {tdliKey, done, desc} = this.tdliValues[fakeTdliKey];
 
             return (
                 <TDLI key={fakeTdliKey}
                       tdliKey={tdliKey}
-                      tdliDone={tdliDone}
-                      tdliDesc={tdliDesc}
+                      tdliDone={done}
+                      tdliDesc={desc}
                       handleTdliDoneChange={this.handleTdliDoneChange}
                       handleTdliDescInput={this.handleTdliDescInput}
                       lastItem={index === tdliKeysState.length - 1} />
@@ -202,13 +221,14 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
                  style={{backgroundColor: tdColorState}}>
                 <TextEdit className="todo-edit-title"
                           textEditKey={tdKey}
+                          initText={tdTitle}
                           handleInput={this.handleTdTitleInput} />
                 <ul className="todo-edit-list-items">
                     {tdlis}
                 </ul>
                 <OptionsPanel todoId=""
-                              removeTodo={this.resetSelf}
-                              changeColor={this.handleTdColorChange} />
+                              removeTodo={this.handleRemoveTodo}
+                              changeColor={this.handleChangeColor} />
             </div>
         )
     }

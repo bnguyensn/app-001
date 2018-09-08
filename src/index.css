@@ -24,3 +24,15 @@ body {
         font-size: 20px;
     }
 }
+
+.hidden {
+    display: none;
+}
+
+.hidden-vis {
+    visibility: hidden;
+}
+
+.hidden-op {
+    opacity: 0;
+}

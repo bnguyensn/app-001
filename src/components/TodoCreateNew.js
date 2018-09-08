@@ -38,7 +38,7 @@ function TDLI(props: TDLIProps) {
                           checked={tdliDone}
                           handleChange={handleTdliDoneChange} />
             </div>
-            <TextEdit elKey={tdliKey}
+            <TextEdit textEditKey={tdliKey}
                       className="todo-edit-list-item-description"
                       initText={tdliDesc}
                       handleInput={handleTdliDescInput} />
@@ -271,7 +271,7 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
             <div className="todo-create-new"
                  style={{backgroundColor: tdColor}}>
                 <TextEdit className="todo-edit-title"
-                          elKey="tdcnTitle"
+                          textEditKey="tdcnTitle"
                           handleInput={this.handleTdTitleInput} />
                 <ul className="todo-edit-list-items">
                     {tdlis}

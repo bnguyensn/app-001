@@ -2,18 +2,25 @@
 
 import * as React from 'react';
 
-export default function ClickableDiv(props: {children?: React.Node, handleClick?: () => mixed}) {
+type ClickableDivProps = {
+    children?: React.Node,
+    handleClick?: (e: SyntheticEvent<>) => mixed,
+}
+
+export default function ClickableDiv(props: ClickableDivProps) {
     const {children, handleClick, ...rest} = props;
 
-    const click = () => {
+    const click = (e: SyntheticMouseEvent<>) => {
         if (handleClick) {
-            handleClick();
+            handleClick(e);
         }
     };
 
     const keyPress = (e: SyntheticKeyboardEvent<>) => {
         if (e.key === 'Enter') {
-            click();
+            if (handleClick) {
+                handleClick(e);
+            }
         }
     };
 

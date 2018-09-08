@@ -3,7 +3,8 @@
 import * as React from 'react';
 import TodoCreateNew from './TodoCreateNew';
 import TodoCard from './TodoCard';
-import TodoEdit from './TodoEdit';
+import TodoEditWindow from './TodoEditWindow';
+import type {TodoEditProps} from './TodoEdit';
 
 import {elHasClass, elChildOfClass} from '../utils/classes';
 
@@ -11,6 +12,8 @@ import {getAllTodoKeys} from '../api/indexedDB/readIDB';
 import {removeTodo} from '../api/indexedDB/removeItemsIDB';
 
 import './css/todo-components.css';
+
+/** ********** MISC. COMPONENTS ********** **/
 
 function EmptyBoard() {
     return (
@@ -25,18 +28,16 @@ function LogMessage(props: {msg: string}) {
     )
 }
 
+/** ********** TO-DO BOARD ********** **/
+
 type TodoBoardStates = {
+    logMsgKeys: number[],
     logMsgData: {},  // Structure: {logMsgKey: msg: x, ...}
-    logMsgKeys: number[],  // Need this to display logMsgData in chronological order
     tdKeys: string[],
+    tdHiddenVisStates: {},  // Structure: {tdKey: x, ...}
     todoCreateNewKey: boolean,  // Used to reset <TodoCreateNew />
-    todoEditData: {  // Used to populate data for <TodoEdit />
-        todoEditKey: string,
-        todoEditTitle: string,
-        todoEditColor: string,
-        todoEditTdliValues: {},
-        todoEditHidden: boolean,
-    },
+    todoEditWindowHidden: boolean,
+    todoEditProps: TodoEditProps,  // Used to populate data for <TodoEdit />
 };
 
 export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> {
@@ -46,16 +47,18 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         super(props);
         this.logMsgKeysCount = 0;
         this.state = {
-            logMsgData: {},
             logMsgKeys: [],
+            logMsgData: {},
             tdKeys: [],
+            tdHiddenVisStates: {},
             todoCreateNewKey: false,
-            todoEditData: {
-                todoEditKey: '',
-                todoEditTitle: '',
-                todoEditColor: '#EEEEEE',
-                todoEditTdliValues: {},
-                todoEditHidden: true,
+            todoEditWindowHidden: true,
+            todoEditProps: {
+                tdKey: '',
+                tdTitle: '',
+                tdColor: '#EEEEEE',
+                tdliKeys: [],
+                tdliValues: {},
             },
         };
     }
@@ -65,13 +68,15 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         this.logNewMsg(res);
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps: {}, prevState: TodoBoardStates, snapshot: any) {
         // Scroll to the bottom of the logs
         const logsEl = document.getElementById('todo-board-logs');
         if (logsEl) {
             logsEl.scrollTop = logsEl.scrollHeight;
         }
     }
+
+    /** ********** LOGGING ********** **/
 
     logNewMsg = (msg: string | Error) => {
         if (msg) {
@@ -93,12 +98,22 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         }
     };
 
+    /** ********** STUFF ********** **/
+
     syncWithDb = async () => {
         try {
             const tdKeys = await getAllTodoKeys();
+
+            const tdHiddenVisStates = {};
+            tdKeys.forEach((tdKey) => {
+                tdHiddenVisStates[tdKey] = false;
+            });
+
             this.setState({
                 tdKeys,
+                tdHiddenVisStates,
             });
+
             return 'TodoBoard synchronised with database.'
         } catch (e) {
             return e
@@ -138,13 +153,49 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         }));
     };
 
-    startEdit = () => {
+    /** ********** TO-DO EDIT WINDOW ********** **/
 
+    startEdit = (todoEditProps: TodoEditProps) => {
+        const {tdKey} = todoEditProps;
+        const {tdHiddenVisStates} = this.state;
+
+        const tdHiddenVisStatesNew = Object.assign({}, tdHiddenVisStates);
+        tdHiddenVisStatesNew[tdKey] = true;
+
+        this.setState({
+            todoEditWindowHidden: false,
+            todoEditProps,
+            tdHiddenVisStates: tdHiddenVisStatesNew,
+        });
     };
 
+    stopEdit = (todoEditProps: TodoEditProps) => {
+        const {tdKey} = todoEditProps;
+        const {tdHiddenVisStates} = this.state;
+
+        const tdHiddenVisStatesNew = Object.assign({}, tdHiddenVisStates);
+        tdHiddenVisStatesNew[tdKey] = false;
+
+        this.setState({
+            todoEditWindowHidden: true,
+            tdHiddenVisStates: tdHiddenVisStatesNew,
+            todoEditProps: {
+                tdKey: '',
+                tdTitle: '',
+                tdColor: '#EEEEEE',
+                tdliKeys: [],
+                tdliValues: {},
+            },
+        });
+    };
+
+    /** ********** RENDER ********** **/
+
     render() {
-        const {logMsgData, logMsgKeys, tdKeys, todoCreateNewKey, todoEditData} = this.state;
-        const {todoEditKey, todoEditTitle, todoEditColor, todoEditTdliValues, todoEditHidden} = todoEditData;
+        const {
+            logMsgData, logMsgKeys, tdKeys, tdHiddenVisStates,
+            todoEditWindowHidden, todoCreateNewKey, todoEditProps,
+        } = this.state;
 
         // Generate log message elements
         const logMsgEls = logMsgKeys.map(logMsgKey => (
@@ -156,7 +207,9 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
             <TodoCard key={tdKey}
                       tdKey={tdKey}
                       logNewMsg={this.logNewMsg}
-                      removeTodo={this.removeTodo} />
+                      removeTodo={this.removeTodo}
+                      startEdit={this.startEdit}
+                      hiddenVis={tdHiddenVisStates[tdKey]} />
         ));
 
         return (
@@ -173,13 +226,11 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
                                    dbSync={this.syncWithDb}
                                    reset={this.resetTodoCreateNew} />
                 </section>
-                <section className="todo-edit-lightbox-bkg">
-                    <TodoEdit tdKey={todoEditKey}
-                              defaultTdTitle={todoEditTitle}
-                              defaultTdColor={todoEditColor}
-                              defaultTdliValues={todoEditTdliValues}
-                              hidden={todoEditHidden} />
-                </section>
+                <TodoEditWindow key={todoEditWindowHidden.toString()}
+                                todoEditProps={Object.assign({}, todoEditProps)}
+                                handleRemoveTodo={this.removeTodo}
+                                stopEdit={this.stopEdit}
+                                hidden={todoEditWindowHidden} />
                 <section className="todo-cards">
                     {tdCards.length > 0 ? tdCards : <EmptyBoard />}
                 </section>

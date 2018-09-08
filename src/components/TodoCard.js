@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import OptionsPanel from './OptionsPanel';
+import type {TodoEditProps} from './TodoEdit';
 
 import {getTodo, getAllTodoListItems} from '../api/indexedDB/readIDB';
 import {putTodo} from '../api/indexedDB/addItemsIDB';
@@ -11,6 +12,8 @@ function EmptyCard() {
         <li>There doesn&#39;t seem to be anything here.</li>
     )
 }
+
+/** ********** TO-DO CARD LIST ITEM ********** **/
 
 type TDLIProps = {
     tdliDone: boolean,
@@ -32,10 +35,14 @@ function TDLI(props: TDLIProps) {
     )
 }
 
+/** ********** TO-DO CARD ********** **/
+
 type TodoCardProps = {
     tdKey: string,
     logNewMsg: (msg: string) => void,
     removeTodo: (todoId: string) => Promise<string>,
+    startEdit: (todoEditData: TodoEditProps) => void,
+    hiddenVis: boolean,
 };
 
 type TodoCardStates = {
@@ -113,21 +120,36 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         }
     };
 
-    handleClick = (e: SyntheticMouseEvent<>) => {
+    handleClick = () => {
+        const {tdKey, startEdit} = this.props;
+        const {tdTitle, tdColor, tdliKeys, tdliValues} = this.state;
 
+        const todoEditData = {
+            tdKey,
+            tdTitle,
+            tdColor,
+            tdliKeys,
+            tdliValues,
+        };
+
+        startEdit(todoEditData);
     };
 
-    handleKeyPress = () => {
-
+    handleKeyPress = (e: SyntheticKeyboardEvent<>) => {
+        if (e.key === 'Enter') {
+            this.handleClick();
+        }
     };
 
     handleFocus = () => {
-        // Display selection circle
+        console.log('To-do card is focused.');
     };
 
     render() {
-        const {tdKey, removeTodo} = this.props;
+        const {tdKey, removeTodo, hiddenVis} = this.props;
         const {tdTitle, tdColor, tdliKeys, tdliValues} = this.state;
+
+        const hiddenVisCls = hiddenVis ? 'hidden-vis' : '';
 
         const tdlis = tdliKeys.map((tdliKey) => {
             const tdliDone = tdliValues[tdliKey].done;
@@ -137,8 +159,8 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         });
 
         return (
-            <div className="todo-card"
-                 role="button" tabIndex={0} aria-label={`To-do #${tdKey}`}
+            <div className={`todo-card ${hiddenVisCls}`}
+                 role="button" tabIndex={0}
                  style={{backgroundColor: tdColor}}
                  onClick={this.handleClick}
                  onKeyPress={this.handleKeyPress}
