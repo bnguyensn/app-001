@@ -226,14 +226,14 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
                                    dbSync={this.syncWithDb}
                                    reset={this.resetTodoCreateNew} />
                 </section>
+                <section className="todo-cards">
+                    {tdCards.length > 0 ? tdCards : <EmptyBoard />}
+                </section>
                 <TodoEditWindow key={todoEditWindowHidden.toString()}
                                 todoEditProps={Object.assign({}, todoEditProps)}
                                 handleRemoveTodo={this.removeTodo}
                                 stopEdit={this.stopEdit}
                                 hidden={todoEditWindowHidden} />
-                <section className="todo-cards">
-                    {tdCards.length > 0 ? tdCards : <EmptyBoard />}
-                </section>
             </div>
         )
     }

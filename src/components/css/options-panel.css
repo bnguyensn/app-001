@@ -5,6 +5,7 @@
 /** ********** Container & Generic children rules ********** **/
 
 .todo-options-panel {
+    position: relative;
     display: flex;
     justify-content: flex-start;
     padding: .5rem;
