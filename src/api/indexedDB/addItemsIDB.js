@@ -184,7 +184,7 @@ async function putTodoListItem(todoListItem, putKey = undefined) {
                 done: todoListItem.done,
             };
 
-        return await add('todoListItems', itemToAdd, true, putKey)
+        return await add('todoListItems', itemToAdd, true, sanitizeNumber(putKey))
     } catch (e) {
         throw e
     }

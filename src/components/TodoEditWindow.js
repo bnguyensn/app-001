@@ -20,6 +20,7 @@ function Backdrop(props: BackdropProps) {
     const hiddenCls = hidden ? 'hidden' : '';
 
     const click = (e: SyntheticEvent<>) => {
+        e.stopPropagation();
         if (e.target === e.currentTarget) {
             stopEdit(todoEditProps);
         }
@@ -37,6 +38,7 @@ function Backdrop(props: BackdropProps) {
 
 type TodoEditWindowProps = {
     todoEditProps: TodoEditProps,
+    handleTodoEditUnmounting: () => Promise<>,
     handleRemoveTodo: (todoId: string) => Promise<string>,
     stopEdit: (todoEditProps: TodoEditProps) => void,
     hidden: boolean,
@@ -50,7 +52,7 @@ export default class TodoEditWindow extends React.PureComponent<TodoEditWindowPr
         console.log('');
     }
 
-    handleRemoveTodo = () => {
+    handleTodoEditSelfRemoval = () => {
         const {todoEditProps, handleRemoveTodo, stopEdit} = this.props;
         const {tdKey} = todoEditProps;
 
@@ -62,8 +64,9 @@ export default class TodoEditWindow extends React.PureComponent<TodoEditWindowPr
     };
 
     render() {
-        const {todoEditProps, stopEdit, hidden} = this.props;
+        const {todoEditProps, handleTodoEditUnmounting, stopEdit, hidden} = this.props;
         const {tdKey, tdTitle, tdColor, tdliKeys, tdliValues} = todoEditProps;
+        console.log(`TodoEditWindow re-rendered!`);
         console.log(`todoEditProps of TodoEditWindow: ${JSON.stringify(todoEditProps)}`);
 
         const hiddenCls = hidden ? 'hidden' : '';
@@ -78,7 +81,8 @@ export default class TodoEditWindow extends React.PureComponent<TodoEditWindowPr
                               tdColor={tdColor}
                               tdliKeys={tdliKeys}
                               tdliValues={tdliValues}
-                              handleRemoveTodo={this.handleRemoveTodo} />
+                              handleSelfRemoval={this.handleTodoEditSelfRemoval}
+                              handleUnmounting={handleTodoEditUnmounting} />
                 </div>
             </Backdrop>
         )

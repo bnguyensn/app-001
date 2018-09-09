@@ -189,6 +189,16 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         });
     };
 
+    handleTodoEditUnmounting = async () => {
+        try {
+            const resSync = await this.syncWithDb();
+            this.logNewMsg(resSync);
+        } catch (e) {
+            this.logNewMsg(e);
+        }
+
+    };
+
     /** ********** RENDER ********** **/
 
     render() {
@@ -231,6 +241,7 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
                 </section>
                 <TodoEditWindow key={todoEditWindowHidden.toString()}
                                 todoEditProps={Object.assign({}, todoEditProps)}
+                                handleTodoEditUnmounting={this.handleTodoEditUnmounting}
                                 handleRemoveTodo={this.removeTodo}
                                 stopEdit={this.stopEdit}
                                 hidden={todoEditWindowHidden} />
