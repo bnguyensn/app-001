@@ -4,13 +4,12 @@ import * as React from 'react';
 import './css/text-edit.css';
 
 type TextEditProps = {
-    id?: string,
+    id: string,  // Note: this is NOT the HTML id property but rather the database id (or fake database id for TDLIs)
     className?: string,
     placeholder?: string,
-    textEditKey?: string,
     initText?: string,
-    handleInput?: (key: string, newValue: string, textEditEL: Node) => void,
-    handleBlur?: (key: string, curValue: string) => void,
+    handleInput: (id: string, newValue: string, textEditEL: Node) => void,
+    handleBlur?: (id: string, curValue: string, textEditEl: Node) => void,
 };
 
 export default class TextEdit extends React.PureComponent<TextEditProps, {}> {
@@ -29,27 +28,22 @@ export default class TextEdit extends React.PureComponent<TextEditProps, {}> {
     }
 
     handleInput = (e: SyntheticInputEvent<HTMLDivElement>) => {
-        const {textEditKey, handleInput} = this.props;
-        if (textEditKey && handleInput) {
-            const key = textEditKey || '';
-            handleInput(key, e.currentTarget.textContent, e.currentTarget);
-        }
+        const {id, handleInput} = this.props;
+        handleInput(id, e.currentTarget.textContent, e.currentTarget);
     };
 
     handleBlur = (e: SyntheticInputEvent<HTMLDivElement>) => {
-        const {textEditKey, handleBlur} = this.props;
+        const {id, handleBlur} = this.props;
         if (handleBlur) {
-            const key = textEditKey || '';
-            handleBlur(key, e.currentTarget.textContent);
+            handleBlur(id, e.currentTarget.textContent, e.currentTarget);
         }
     };
 
     render() {
-        const {className, id, placeholder} = this.props;
+        const {className, placeholder} = this.props;
 
         return (
             <div ref={this.el}
-                 id={id || ''}
                  className={`text-edit ${className || ''}`}
                  placeholder={placeholder || 'Type something...'}
                  onInput={this.handleInput}

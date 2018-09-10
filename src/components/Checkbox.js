@@ -3,11 +3,9 @@
 import * as React from 'react';
 
 type CheckboxProps = {
-    id?: string,
-    className?: string,
-    elKey?: string,
-    checked?: boolean,
-    handleChange?: (key: string, newValue: boolean) => void,
+    fakeTdliId: string,
+    checked: boolean,
+    handleChange: (key: string, newValue: boolean) => void,
 };
 
 type CheckboxStates = {
@@ -18,30 +16,26 @@ export default class Checkbox extends React.PureComponent<CheckboxProps, Checkbo
     constructor(props: CheckboxProps) {
         super(props);
         this.state = {
-            checked: props.checked || false,
+            checked: props.checked,
         };
     }
 
     handleChange = () => {
-        const {elKey, handleChange} = this.props;
-        const {checked: curChecked} = this.state;
-        if (handleChange) {
-            const key = elKey || '';
-            handleChange(key, !curChecked);
-        }
+        const {fakeTdliId, handleChange} = this.props;
+        const {checked} = this.state;
+
+        handleChange(fakeTdliId, !checked);
+
         this.setState({
-            checked: !curChecked,
+            checked: !checked,
         });
     };
 
     render() {
-        const {className, id} = this.props;
         const {checked} = this.state;
 
         return (
-            <input id={id || ''}
-                   className={className || ''}
-                   type="checkbox"
+            <input type="checkbox"
                    checked={checked}
                    onChange={this.handleChange} />
         )
