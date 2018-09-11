@@ -25,7 +25,7 @@ type TDLIProps = {
 
 export default function TodoEditTDLI(props: TDLIProps) {
     const {
-        fakeTdliId,
+        tdliId,
         tdliDone,
         tdliDesc,
         handleTdliDoneChange,

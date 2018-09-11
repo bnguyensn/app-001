@@ -23,6 +23,7 @@ export type TodoEditProps = {
     handleSelfRemoval?: () => void,
 
     // This should be a database method, hence the Promise return
+    // After editing finishes, we save data to the database
     handleFinishEditing: (todoData: TodoData) => Promise<>,
 };
 
@@ -127,10 +128,12 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
         const {tdId} = this.props;
         const {fakeTdliIds, tdColor} = this.state;
 
+        const tdliIds = [];
         const tdliData = {};
         fakeTdliIds.forEach((fakeTdliId) => {
             const {tdliId, done, desc} = this.tdliData[fakeTdliId];
 
+            tdliIds.push(tdliId);
             tdliData[tdliId].done = done;
             tdliData[tdliId].desc = desc;
         });
@@ -139,6 +142,7 @@ export default class TodoEdit extends React.PureComponent<TodoEditProps, TodoEdi
             tdId,
             tdTitle: this.tdTitle,
             tdColor,
+            tdliIds,
             tdliData,
         }
     };
