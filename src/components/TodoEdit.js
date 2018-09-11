@@ -24,7 +24,7 @@ export type TodoEditProps = {
 
     // This should be a database method, hence the Promise return
     // After editing finishes, we save data to the database
-    handleFinishEditing: (todoData: TodoData) => Promise<>,
+    handleFinishEditing: (todoData: TodoData) => Promise<void>,
 };
 
 type TodoEditStates = {

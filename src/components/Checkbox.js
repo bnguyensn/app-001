@@ -5,7 +5,7 @@ import * as React from 'react';
 type CheckboxProps = {
     fakeTdliId: string,
     checked: boolean,
-    handleChange: (id: string, newValue: boolean) => void,
+    handleChange: (id: string, newValue: boolean) => void | Promise<void>,
 };
 
 type CheckboxStates = {

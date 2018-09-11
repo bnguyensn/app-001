@@ -185,9 +185,12 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
             const tdliDone = tdliData[tdliKey].done;
             const tdliDesc = tdliData[tdliKey].desc;
 
-            return <TodoCardTDLI tdliId={tdliKey}
+            return (
+                <TodoCardTDLI tdliId={tdliKey}
                                  tdliDone={tdliDone}
-                                 tdliDesc={tdliDesc} />
+                                 tdliDesc={tdliDesc}
+                                 handleTdliDoneChange={this.handleTdliDoneChange} />
+            )
         });
 
         return (
