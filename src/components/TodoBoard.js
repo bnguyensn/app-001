@@ -78,7 +78,7 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
 
     /** ********** LOGGING ********** **/
 
-    logNewMsg = (msg: string | Error) => {
+    logNewMsg = (msg: string) => {
         if (msg) {
             const {logMsgData} = this.state;
             const newLogMsgKey = this.logMsgKeysCount;
@@ -215,9 +215,9 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         // Generate <TodoCard />
         const tdCards = tdKeys.map(tdKey => (
             <TodoCard key={tdKey}
-                      tdKey={tdKey}
+                      tdId={tdKey}
                       logNewMsg={this.logNewMsg}
-                      removeTodo={this.removeTodo}
+                      handleSelfRemoval={this.removeTodo}
                       startEdit={this.startEdit}
                       hiddenVis={tdHiddenVisStates[tdKey]} />
         ));

@@ -19,7 +19,7 @@ type TDLIProps = {
 
 function TDLI(props: TDLIProps) {
     const {
-        tdliKey, tdliDone, tdliDesc,
+        tdliId, tdliDone, tdliDesc,
         handleTdliDoneChange, handleTdliDescInput,
         lastItem,
     } = props;
@@ -34,11 +34,11 @@ function TDLI(props: TDLIProps) {
                 : <div style={{width: '1rem', height: '1rem'}} />
             }
             <div className="todo-edit-list-item-checkbox">
-                <Checkbox elKey={tdliKey}
+                <Checkbox elId={tdliKey}
                           checked={tdliDone}
                           handleChange={handleTdliDoneChange} />
             </div>
-            <TextEdit textEditKey={tdliKey}
+            <TextEdit id={tdliKey}
                       className="todo-edit-list-item-description"
                       initText={tdliDesc}
                       handleInput={handleTdliDescInput} />
@@ -271,12 +271,12 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
             <div className="todo-create-new"
                  style={{backgroundColor: tdColor}}>
                 <TextEdit className="todo-edit-title"
-                          textEditKey="tdcnTitle"
+                          id="tdcnTitle"
                           handleInput={this.handleTdTitleInput} />
                 <ul className="todo-edit-list-items">
                     {tdlis}
                 </ul>
-                <OptionsPanel todoId=""
+                <OptionsPanel tdId=""
                               removeTodo={this.resetSelf}
                               changeColor={this.handleTdColorChange} />
             </div>

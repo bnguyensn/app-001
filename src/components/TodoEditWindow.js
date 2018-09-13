@@ -65,7 +65,7 @@ export default class TodoEditWindow extends React.PureComponent<TodoEditWindowPr
 
     render() {
         const {todoEditProps, handleTodoEditUnmounting, stopEdit, hidden} = this.props;
-        const {tdKey, tdTitle, tdColor, tdliKeys, tdliValues} = todoEditProps;
+        const {tdKey, tdTitle, tdColor, tdliIds, tdliData} = todoEditProps;
         console.log(`TodoEditWindow re-rendered!`);
         console.log(`todoEditProps of TodoEditWindow: ${JSON.stringify(todoEditProps)}`);
 
