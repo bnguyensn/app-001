@@ -29,8 +29,8 @@ async function add(objStoreName, item, put = false, putKey = undefined) {
             const addedItems = [];
             let processedCount = 0;
 
-            item.forEach((it) => {
-                const req = put ? objStore.put(it, putKey) : objStore.add(it);
+            item.forEach((it, index) => {
+                const req = put ? objStore.put(it, putKey[index]) : objStore.add(it);
 
                 req.onerror = () => {
                     processedCount += 1;
@@ -169,7 +169,7 @@ async function addTodoListItem(todoListItem) {
 /**
  * Could put a single or an array of todoListItem
  * */
-async function putTodoListItem(todoListItem, putKey = undefined) {
+async function putTodoListItem(todoListItem, putKey) {
     try {
         // Make sure the item(s) being added is/are in conformity with our database
         const itemToAdd = Array.isArray(todoListItem)
