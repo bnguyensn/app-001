@@ -9,11 +9,11 @@ import {addTodo, addTodoListItem} from '../api/indexedDB/addItemsIDB';
 import OptionsPanel from './OptionsPanel';
 
 type TDLIProps = {
-    tdliKey: string,
+    tdliId: string,
     tdliDone: boolean,
     tdliDesc: string,
-    handleTdliDoneChange: (tdliKey: string, newValue: boolean) => void,
-    handleTdliDescInput: (tdliKey: string, newValue: string, textEditEl: Node) => void,
+    handleTdliDoneChange: (tdliId: string, newValue: boolean) => void,
+    handleTdliDescInput: (tdliId: string, newValue: string, textEditEl: Node) => void,
     lastItem: boolean,
 };
 
@@ -34,11 +34,11 @@ function TDLI(props: TDLIProps) {
                 : <div style={{width: '1rem', height: '1rem'}} />
             }
             <div className="todo-edit-list-item-checkbox">
-                <Checkbox elId={tdliKey}
+                <Checkbox fakeTdliId={tdliId}
                           checked={tdliDone}
                           handleChange={handleTdliDoneChange} />
             </div>
-            <TextEdit id={tdliKey}
+            <TextEdit id={tdliId}
                       className="todo-edit-list-item-description"
                       initText={tdliDesc}
                       handleInput={handleTdliDescInput} />
@@ -60,7 +60,7 @@ type TodoCreateNewProps = {
 
 type TodoCreateNewStates = {
     tdColor: string,
-    tdliKeys: string[],
+    tdliIds: string[],
 };
 
 export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProps, TodoCreateNewStates> {
@@ -76,15 +76,15 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         this.keysCount = 0;
         this.forceResetNoSave = false;
 
-        const initialTdliKey = this.getNewKey();
-        this.tdliValues[initialTdliKey] = {
+        const initialTdliId = this.getNewKey();
+        this.tdliValues[initialTdliId] = {
             done: false,
             desc: '',
         };
 
         this.state = {
             tdColor: '#EEEEEE',
-            tdliKeys: [initialTdliKey],
+            tdliIds: [initialTdliId],
         };
     }
 
@@ -131,22 +131,22 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         return false
     };
 
-    handleTdTitleInput = (key: string, newValue: string, textEditEl: Node) => {
+    handleTdTitleInput = (tdId: string, newValue: string, textEditEl: Node) => {
         this.tdTitle = newValue;
     };
 
-    handleTdColorChange = (key: string, newValue: string) => {
+    handleTdColorChange = (tdId: string, newValue: string) => {
         this.setState({
             tdColor: newValue,
         });
     };
 
-    handleTdliDoneChange = (tdliKey: string, newValue: boolean) => {
-        this.tdliValues[tdliKey].done = newValue;
+    handleTdliDoneChange = (tdliId: string, newValue: boolean) => {
+        this.tdliValues[tdliId].done = newValue;
     };
 
-    handleTdliDescInput = (tdliKey: string, newValue: string, textEditEl: Node) => {
-        this.tdliValues[tdliKey].desc = newValue;
+    handleTdliDescInput = (tdliId: string, newValue: string, textEditEl: Node) => {
+        this.tdliValues[tdliId].desc = newValue;
 
         // Add new TDLI if applicable
         const tdliEl = textEditEl.parentNode;
@@ -156,26 +156,26 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
     };
 
     addNewTdli = () => {
-        const newTdliKey = this.getNewKey();
-        this.tdliValues[newTdliKey] = {
+        const newtdliId = this.getNewKey();
+        this.tdliValues[newtdliId] = {
             done: false,
             desc: '',
         };
         this.setState(prevState => ({
-            tdliKeys: [...prevState.tdliKeys, newTdliKey],
+            tdliIds: [...prevState.tdliIds, newtdliId],
         }));
     };
 
     checkEmptyTdTitle = () => this.tdTitle === '';
 
     checkEmptyTdliValues = () => {
-        const {tdliKeys} = this.state;
-        return tdliKeys.every(tdliKey => this.tdliValues[tdliKey].desc === '');
+        const {tdliIds} = this.state;
+        return tdliIds.every(tdliId => this.tdliValues[tdliId].desc === '');
     };
 
     checkNoChanges = () => {
-        const {tdliKeys} = this.state;
-        return this.checkEmptyTdTitle() && tdliKeys.length <= 1
+        const {tdliIds} = this.state;
+        return this.checkEmptyTdTitle() && tdliIds.length <= 1
     };
 
     saveTdToDB = async () => {
@@ -187,7 +187,7 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
                 }
             }
 
-            const {tdliKeys, tdColor} = this.state;
+            const {tdliIds, tdColor} = this.state;
 
             if (this.checkEmptyTdliValues()) {
                 if (this.checkEmptyTdTitle()) {
@@ -205,13 +205,13 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
                     title: this.tdTitle,
                     color: tdColor,
                 };
-                const addedTdKey = (await addTodo(tdToAdd)).data;
+                const addedtdId = (await addTodo(tdToAdd)).data;
 
                 return {
-                    msg: `Added todo #${addedTdKey}`,
+                    msg: `Added todo #${addedtdId}`,
                     data: {
-                        tdKey: addedTdKey,
-                        tdliKeys: null,
+                        tdId: addedtdId,
+                        tdliIds: null,
                     },
                 }
             }
@@ -222,26 +222,26 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
                 title: this.tdTitle,
                 color: tdColor,
             };
-            const addedTdKey = (await addTodo(tdToAdd)).data;
+            const addedtdId = (await addTodo(tdToAdd)).data;
 
-            const tdlisToAdd = tdliKeys.reduce((res, tdliKey, index) => {
-                if (index < tdliKeys.length - 1) {
+            const tdlisToAdd = tdliIds.reduce((res, tdliId, index) => {
+                if (index < tdliIds.length - 1) {
                     const tdliToAdd = {
-                        todoId: addedTdKey,
-                        done: this.tdliValues[tdliKey].done,
-                        description: this.tdliValues[tdliKey].desc,
+                        todoId: addedtdId,
+                        done: this.tdliValues[tdliId].done,
+                        description: this.tdliValues[tdliId].desc,
                     };
                     res.push(tdliToAdd);
                 }
                 return res
             }, []);
-            const addedTdliKeys = (await addTodoListItem(tdlisToAdd)).data;
+            const addedtdliIds = (await addTodoListItem(tdlisToAdd)).data;
 
             return {
-                msg: `Added todo #${addedTdKey} and todoListItems #[${addedTdliKeys}]`,
+                msg: `Added todo #${addedtdId} and todoListItems #[${addedtdliIds}]`,
                 data: {
-                    tdKey: addedTdKey,
-                    tdliKeys: addedTdliKeys,
+                    tdId: addedtdId,
+                    tdliIds: addedtdliIds,
                 },
             }
         } catch (e) {
@@ -250,20 +250,20 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
     };
 
     render() {
-        const {tdliKeys, tdColor} = this.state;
+        const {tdliIds, tdColor} = this.state;
 
-        const tdlis = tdliKeys.map((tdliKey, index) => {
-            const tdliDone = this.tdliValues[tdliKey].done;
-            const tdliDesc = this.tdliValues[tdliKey].desc;
+        const tdlis = tdliIds.map((tdliId, index) => {
+            const tdliDone = this.tdliValues[tdliId].done;
+            const tdliDesc = this.tdliValues[tdliId].desc;
 
             return (
-                <TDLI key={tdliKey}
-                      tdliKey={tdliKey}
+                <TDLI key={tdliId}
+                      tdliId={tdliId}
                       tdliDone={tdliDone}
                       tdliDesc={tdliDesc}
                       handleTdliDoneChange={this.handleTdliDoneChange}
                       handleTdliDescInput={this.handleTdliDescInput}
-                      lastItem={index === tdliKeys.length - 1} />
+                      lastItem={index === tdliIds.length - 1} />
             )
         });
 

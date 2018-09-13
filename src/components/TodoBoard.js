@@ -3,8 +3,6 @@
 import * as React from 'react';
 import TodoCreateNew from './TodoCreateNew';
 import TodoCard from './TodoCard';
-import TodoEditWindow from './TodoEditWindow';
-import type {TodoEditProps} from './TodoEdit';
 
 import {elHasClass, elChildOfClass} from '../utils/classes';
 
@@ -34,10 +32,7 @@ type TodoBoardStates = {
     logMsgKeys: number[],
     logMsgData: {},  // Structure: {logMsgKey: msg: x, ...}
     tdKeys: string[],
-    tdHiddenVisStates: {},  // Structure: {tdKey: x, ...}
     todoCreateNewKey: boolean,  // Used to reset <TodoCreateNew />
-    todoEditWindowHidden: boolean,
-    todoEditProps: TodoEditProps,  // Used to populate data for <TodoEdit />
 };
 
 export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> {
@@ -50,16 +45,7 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
             logMsgKeys: [],
             logMsgData: {},
             tdKeys: [],
-            tdHiddenVisStates: {},
             todoCreateNewKey: false,
-            todoEditWindowHidden: true,
-            todoEditProps: {
-                tdKey: '',
-                tdTitle: '',
-                tdColor: '#EEEEEE',
-                tdliKeys: [],
-                tdliValues: {},
-            },
         };
     }
 
@@ -111,7 +97,6 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
 
             this.setState({
                 tdKeys,
-                tdHiddenVisStates,
             });
 
             return 'TodoBoard synchronised with database.'
@@ -153,58 +138,12 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         }));
     };
 
-    /** ********** TO-DO EDIT WINDOW ********** **/
-
-    startEdit = (todoEditProps: TodoEditProps) => {
-        const {tdKey} = todoEditProps;
-        const {tdHiddenVisStates} = this.state;
-
-        const tdHiddenVisStatesNew = Object.assign({}, tdHiddenVisStates);
-        tdHiddenVisStatesNew[tdKey] = true;
-
-        this.setState({
-            todoEditWindowHidden: false,
-            todoEditProps,
-            tdHiddenVisStates: tdHiddenVisStatesNew,
-        });
-    };
-
-    stopEdit = (todoEditProps: TodoEditProps) => {
-        const {tdKey} = todoEditProps;
-        const {tdHiddenVisStates} = this.state;
-
-        const tdHiddenVisStatesNew = Object.assign({}, tdHiddenVisStates);
-        tdHiddenVisStatesNew[tdKey] = false;
-
-        this.setState({
-            todoEditWindowHidden: true,
-            tdHiddenVisStates: tdHiddenVisStatesNew,
-            todoEditProps: {
-                tdKey: '',
-                tdTitle: '',
-                tdColor: '#EEEEEE',
-                tdliKeys: [],
-                tdliValues: {},
-            },
-        });
-    };
-
-    handleTodoEditUnmounting = async () => {
-        try {
-            const resSync = await this.syncWithDb();
-            this.logNewMsg(resSync);
-        } catch (e) {
-            this.logNewMsg(e);
-        }
-
-    };
-
     /** ********** RENDER ********** **/
 
     render() {
         const {
-            logMsgData, logMsgKeys, tdKeys, tdHiddenVisStates,
-            todoEditWindowHidden, todoCreateNewKey, todoEditProps,
+            logMsgData, logMsgKeys, tdKeys,
+            todoCreateNewKey,
         } = this.state;
 
         // Generate log message elements
@@ -217,9 +156,7 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
             <TodoCard key={tdKey}
                       tdId={tdKey}
                       logNewMsg={this.logNewMsg}
-                      handleSelfRemoval={this.removeTodo}
-                      startEdit={this.startEdit}
-                      hiddenVis={tdHiddenVisStates[tdKey]} />
+                      handleSelfRemoval={this.removeTodo} />
         ));
 
         return (
@@ -239,12 +176,6 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
                 <section className="todo-cards">
                     {tdCards.length > 0 ? tdCards : <EmptyBoard />}
                 </section>
-                <TodoEditWindow key={todoEditWindowHidden.toString()}
-                                todoEditProps={Object.assign({}, todoEditProps)}
-                                handleTodoEditUnmounting={this.handleTodoEditUnmounting}
-                                handleRemoveTodo={this.removeTodo}
-                                stopEdit={this.stopEdit}
-                                hidden={todoEditWindowHidden} />
             </div>
         )
     }

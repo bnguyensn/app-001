@@ -3,11 +3,11 @@
 import * as React from 'react';
 import TodoCardTDLI from './TodoCardTDLI';
 import OptionsPanel from './OptionsPanel';
-import type {TodoEditProps} from './TodoEdit';
+import TodoEdit from './TodoEdit';
+import type {TodoData, TDLIData} from './TodoTypes';
 
 import {getTodo, getAllTodoListItems} from '../api/indexedDB/readIDB';
 import {putTodo, putTodoListItem} from '../api/indexedDB/addItemsIDB';
-import type {TDLIData} from './TodoTypes';
 
 /** ********** TO-DO CARD (EMPTY CONTENT) ********** **/
 
@@ -41,7 +41,7 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
             tdColor: '#EEEEEE',
             tdliIds: [],
             tdliData: {},
-            editing: true,
+            editing: false,
         };
     }
 
@@ -91,15 +91,53 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         }
     };
 
+    syncToDB = async (tdData: TodoData) => {
+        const {logNewMsg} = this.props;
+        const {tdId, tdTitle, tdColor, tdliIds, tdliData} = tdData;
+
+        console.log(`Passed tdData: ${JSON.stringify(tdData)}`);
+
+        try {
+            // Prepare database data
+            const tdObj = {
+                title: tdTitle,
+                color: tdColor,
+            };
+            const tdliObj = tdliIds.map(tdliId => ({
+                todoId: tdId,
+                description: tdliData[tdliId].desc,
+                done: tdliData[tdliId].done,
+            }));
+
+            console.log(`tdObj: ${JSON.stringify(tdObj)}`);
+            console.log(`tdliObj: ${JSON.stringify(tdliObj)}`);
+
+            // Database put operation
+            const tdDataPromise = putTodo(tdObj, tdId);
+            const tdliDataPromise = putTodoListItem(tdliObj, tdliIds);
+            const res = await Promise.all([tdDataPromise, tdliDataPromise]);
+
+            // Log
+            res.forEach((promiseRes) => {
+                logNewMsg(promiseRes);
+            });
+
+            // Re-sync with database
+            this.syncWithDb();
+        } catch (e) {
+            logNewMsg(e);
+        }
+    };
+
     /**
      * Update To-do color in database as well as the DOM
      * */
-    handleColorChange = async (newValue: string) => {
-        const {tdId, logNewMsg} = this.props;
+    handleColorChange = async (tdId: string, newValue: string) => {
+        const {logNewMsg} = this.props;
         const {tdTitle} = this.state;
 
         try {
-            // Prepare data to be put into database
+            // Prepare database data
             const newTdValues = {
                 title: tdTitle,
                 color: newValue,
@@ -120,6 +158,9 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         }
     };
 
+    /**
+     * Update To-do List Item done status in database as well as the DOM
+     * */
     handleTdliDoneChange = async (tdliId: string, newValue: boolean) => {
         const {tdId, logNewMsg} = this.props;
         const {tdliData} = this.state;
@@ -159,6 +200,11 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         });
     };
 
+    finishEditing = (tdData: TodoData) => {
+        this.closeTodoEdit();
+        this.syncToDB(tdData);
+    };
+
     handleTodoCardKeyPress = (e: SyntheticKeyboardEvent<>) => {
         if (e.key === 'Enter') {
             this.openTodoEdit();
@@ -179,17 +225,17 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         const {tdTitle, tdColor, tdliIds, tdliData, editing} = this.state;
 
         const todoCardHiddenCls = editing ? 'hidden-vis' : '';
-        const todoEditHiddenCls = editing ? '' : 'hidden';
 
         const tdlis = tdliIds.map((tdliKey) => {
             const tdliDone = tdliData[tdliKey].done;
             const tdliDesc = tdliData[tdliKey].desc;
 
             return (
-                <TodoCardTDLI tdliId={tdliKey}
-                                 tdliDone={tdliDone}
-                                 tdliDesc={tdliDesc}
-                                 handleTdliDoneChange={this.handleTdliDoneChange} />
+                <TodoCardTDLI key={tdliKey}
+                              tdliId={tdliKey}
+                              tdliDone={tdliDone}
+                              tdliDesc={tdliDesc}
+                              handleTdliDoneChange={this.handleTdliDoneChange} />
             )
         });
 
@@ -209,6 +255,8 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
                 <OptionsPanel tdId={tdId}
                               removeTodo={handleSelfRemoval}
                               changeColor={this.handleColorChange} />
+                <TodoEdit hidden={!editing} tdId={tdId} tdTitle={tdTitle} tdColor={tdColor} tdliData={tdliData}
+                          handleFinishEditing={this.finishEditing} />
             </div>
         )
     }

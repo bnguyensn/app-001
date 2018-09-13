@@ -16,13 +16,15 @@ type ColorButtonProps = {
 function ColorButton(props: ColorButtonProps) {
     const {color, changeColor} = props;
 
-    const click = () => {
+    const click = (e: SyntheticMouseEvent<>) => {
+        e.stopPropagation();
         changeColor(color);
     };
 
     const keyPress = (e: SyntheticKeyboardEvent<>) => {
         if (e.key === 'Enter') {
-            click();
+            e.stopPropagation();
+            changeColor(color);
         }
     };
 
@@ -90,7 +92,8 @@ type OptionsPanelButtonProps = {
 function OptionsPanelButton(props: OptionsPanelButtonProps) {
     const {icon, tooltipText, handleClick, children} = props;
 
-    const click = () => {
+    const click = (e: SyntheticMouseEvent<>) => {
+        e.stopPropagation();
         if (handleClick) {
             handleClick();
         }
@@ -98,14 +101,17 @@ function OptionsPanelButton(props: OptionsPanelButtonProps) {
 
     const keyPress = (e: SyntheticKeyboardEvent<>) => {
         if (e.key === 'Enter') {
-            click();
+            e.stopPropagation();
+            if (handleClick) {
+                handleClick();
+            }
         }
     };
 
     return (
         <div className="todo-options-panel-btn"
              role="button" tabIndex={0} aria-label={icon}
-             onClick={handleClick}
+             onClick={click}
              onKeyPress={keyPress}>
             <MaterialIcon className="md-dark" icon={icon} />
             <OptionsPanelButtonTooltip text={tooltipText} />
@@ -120,6 +126,7 @@ type OptionsPanelProps = {
     tdId: string,
     changeColor: (tdId: string, newValue: string) => Promise<void> | void,
     removeTodo: (tdId: string) => Promise<string> | void,
+    close?: (tdId: string) => Promise<void> | void,
 };
 
 type OptionsPanelStates = {
@@ -150,7 +157,15 @@ export default class OptionsPanel extends React.PureComponent<OptionsPanelProps,
         changeColor(tdId, newValue);
     };
 
+    handleClose = () => {
+        const {tdId, close} = this.props;
+        if (close) {
+            close(tdId);
+        }
+    };
+
     render() {
+        const {close} = this.props;
         const {colorPaletteHidden} = this.state;
 
         return (
@@ -164,6 +179,13 @@ export default class OptionsPanel extends React.PureComponent<OptionsPanelProps,
                     <ColorPalette hidden={colorPaletteHidden}
                                   changeColor={this.handleChangeColor} />
                 </OptionsPanelButton>
+                {close
+                    ? (
+                        <OptionsPanelButton icon="close"
+                                            tooltipText="Close"
+                                            handleClick={this.handleClose} />
+                    )
+                    : null}
             </div>
         )
     }

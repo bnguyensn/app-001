@@ -30,7 +30,7 @@ async function add(objStoreName, item, put = false, putKey = undefined) {
             let processedCount = 0;
 
             item.forEach((it, index) => {
-                const req = put ? objStore.put(it, putKey[index]) : objStore.add(it);
+                const req = put ? objStore.put(it, sanitizeNumber(putKey[index])) : objStore.add(it);
 
                 req.onerror = () => {
                     processedCount += 1;
@@ -184,7 +184,7 @@ async function putTodoListItem(todoListItem, putKey) {
                 done: todoListItem.done,
             };
 
-        return await add('todoListItems', itemToAdd, true, sanitizeNumber(putKey))
+        return await add('todoListItems', itemToAdd, true, putKey)
     } catch (e) {
         throw e
     }

@@ -21,11 +21,19 @@ export default class TextEdit extends React.PureComponent<TextEditProps, {}> {
     }
 
     componentDidMount() {
+        this.updateInitText();
+    }
+
+    componentDidUpdate(prevProps: TextEditProps, prevState: {}, snapshot: any) {
+        this.updateInitText();
+    }
+
+    updateInitText = () => {
         const {initText} = this.props;
         if (initText && this.el.current) {
             this.el.current.textContent += initText;
         }
-    }
+    };
 
     handleInput = (e: SyntheticInputEvent<HTMLDivElement>) => {
         const {id, handleInput} = this.props;
