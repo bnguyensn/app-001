@@ -25,7 +25,7 @@ export default class TextEdit extends React.PureComponent<TextEditProps, {}> {
     }
 
     componentDidUpdate(prevProps: TextEditProps, prevState: {}, snapshot: any) {
-        this.updateInitText();
+        // this.updateInitText();
     }
 
     updateInitText = () => {

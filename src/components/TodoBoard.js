@@ -19,10 +19,16 @@ function EmptyBoard() {
     )
 }
 
-function LogMessage(props: {msg: string}) {
-    const {msg} = props;
+function LogMessage(props: {msg: string, color?: string}) {
+    const {msg, color} = props;
+
+    const colorStyle = color ? {color} : {};
+
     return (
-        <div className="todo-board-log">{msg}</div>
+        <div className="todo-board-log"
+             style={colorStyle}>
+            {msg}
+        </div>
     )
 }
 
@@ -30,7 +36,7 @@ function LogMessage(props: {msg: string}) {
 
 type TodoBoardStates = {
     logMsgKeys: number[],
-    logMsgData: {},  // Structure: {logMsgKey: msg: x, ...}
+    logMsgData: {[key: number]: {msg: string, color: string}},
     tdKeys: string[],
     todoCreateNewKey: boolean,  // Used to reset <TodoCreateNew />
 };
@@ -74,8 +80,10 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
                 ? `> ${msg.name}: ${msg.message}`
                 : `> ${msg}`;
 
+            const newLogColor = msg instanceof Error ? '#e53935' : '';
+
             const newLogMsgData = Object.assign({}, logMsgData);
-            newLogMsgData[newLogMsgKey] = newLogMsg;
+            newLogMsgData[newLogMsgKey] = {msg: newLogMsg, color: newLogColor};
 
             this.setState(prevState => ({
                 logMsgData: newLogMsgData,
@@ -148,7 +156,9 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
 
         // Generate log message elements
         const logMsgEls = logMsgKeys.map(logMsgKey => (
-            <LogMessage key={logMsgKey} msg={logMsgData[logMsgKey]} />
+            <LogMessage key={logMsgKey}
+                        msg={logMsgData[logMsgKey].msg}
+                        color={logMsgData[logMsgKey].color} />
         ));
 
         // Generate <TodoCard />

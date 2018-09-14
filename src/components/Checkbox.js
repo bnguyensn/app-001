@@ -20,6 +20,10 @@ export default class Checkbox extends React.PureComponent<CheckboxProps, Checkbo
         };
     }
 
+    handleClick = (e: SyntheticMouseEvent<>) => {
+        e.stopPropagation();
+    };
+
     handleChange = () => {
         const {fakeTdliId, handleChange} = this.props;
         const {checked} = this.state;
@@ -37,6 +41,7 @@ export default class Checkbox extends React.PureComponent<CheckboxProps, Checkbo
         return (
             <input type="checkbox"
                    checked={checked}
+                   onClick={this.handleClick}
                    onChange={this.handleChange} />
         )
     }

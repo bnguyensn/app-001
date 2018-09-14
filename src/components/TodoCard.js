@@ -49,6 +49,8 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         this.syncWithDb();
     }
 
+    /** ********** DATABASE METHODS ********** **/
+
     /**
      * Update the whole To-do Card to match database data
      * */
@@ -91,6 +93,9 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         }
     };
 
+    /**
+     * Update database with current To-do Card data
+     * */
     syncToDB = async (tdData: TodoData) => {
         const {logNewMsg} = this.props;
         const {tdId, tdTitle, tdColor, tdliIds, tdliData} = tdData;
@@ -118,15 +123,32 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
             const res = await Promise.all([tdDataPromise, tdliDataPromise]);
 
             // Log
-            res.forEach((promiseRes) => {
-                logNewMsg(promiseRes);
+            res.forEach((promiseRes, index) => {
+                logNewMsg(`syncToDB() promise #${index} finished with result: ${JSON.stringify(promiseRes)}`);
             });
 
-            // Re-sync with database
-            this.syncWithDb();
+            // Re-sync with database?
+            // this.syncWithDb();
         } catch (e) {
             logNewMsg(e);
         }
+    };
+
+    /** ********** DOM METHODS ********** **/
+
+    /**
+     * Update To-do Card data to whatever is passed from To-do Edit
+     * */
+    syncToTodoEdit = (tdData: TodoData) => {
+        const {tdTitle, tdColor, tdliIds, tdliData} = tdData;
+
+        // Update state
+        this.setState({
+            tdTitle,
+            tdColor,
+            tdliIds,
+            tdliData,
+        });
     };
 
     /**
@@ -137,6 +159,11 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         const {tdTitle} = this.state;
 
         try {
+            // Update state
+            this.setState({
+                tdColor: newValue,
+            });
+
             // Prepare database data
             const newTdValues = {
                 title: tdTitle,
@@ -148,11 +175,6 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
 
             // Log
             logNewMsg(`To-do Card #${tdId}'s color updated.`);
-
-            // Update state
-            this.setState({
-                tdColor: newValue,
-            });
         } catch (e) {
             logNewMsg(e);
         }
@@ -166,9 +188,12 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
         const {tdliData} = this.state;
         const {desc: description} = tdliData[tdliId];
 
+        console.log(`handleTdliDoneChange: description: ${description}`);
+
         try {
             // Prepare data to be put into database
             const newTdliValues = {
+                todoId: tdId,
                 done: newValue,
                 description,
             };
@@ -181,12 +206,14 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
 
             // Update state
             this.setState(prevState => ({
-                tdliData: {...prevState.tdliData, ...{[tdliId]: newTdliValues}},
+                tdliData: {...prevState.tdliData, ...{[tdliId]: {done: newValue, desc: description}}},
             }));
         } catch (e) {
             logNewMsg(e);
         }
     };
+
+    /** ********** TO-DO EDIT ********** **/
 
     openTodoEdit = () => {
         this.setState({
@@ -202,6 +229,7 @@ export default class TodoCard extends React.PureComponent<TodoCardProps, TodoCar
 
     finishEditing = (tdData: TodoData) => {
         this.closeTodoEdit();
+        this.syncToTodoEdit(tdData);
         this.syncToDB(tdData);
     };
 

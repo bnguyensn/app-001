@@ -256,6 +256,8 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
             const tdliDone = this.tdliValues[tdliId].done;
             const tdliDesc = this.tdliValues[tdliId].desc;
 
+            console.log(`Rendering TDLI: tdliDesc = ${tdliDesc}`);
+
             return (
                 <TDLI key={tdliId}
                       tdliId={tdliId}

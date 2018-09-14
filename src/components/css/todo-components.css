@@ -30,7 +30,8 @@
 /** ********** Logs ********** **/
 
 #todo-board-logs {
-    height: 3rem;
+    width: 100%;
+    height: 5rem;
     padding: .25rem;
     background-color: #212121;
     overflow: scroll;
