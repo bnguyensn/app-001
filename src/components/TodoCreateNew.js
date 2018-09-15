@@ -1,59 +1,17 @@
 // @flow
 
 import * as React from 'react';
-import Checkbox from './Checkbox';
+import TodoCreateNewTDLI from './TodoCreateNewTDLI';
 import TextEdit from './TextEdit';
-import MaterialIcon from './MaterialIcon';
+import OptionsPanel from './OptionsPanel';
+import type {TDLIData} from './TodoTypes';
+
+import {elChildOfClass} from '../utils/classes';
 
 import {addTodo, addTodoListItem} from '../api/indexedDB/addItemsIDB';
-import OptionsPanel from './OptionsPanel';
-
-type TDLIProps = {
-    tdliId: string,
-    tdliDone: boolean,
-    tdliDesc: string,
-    handleTdliDoneChange: (tdliId: string, newValue: boolean) => void,
-    handleTdliDescInput: (tdliId: string, newValue: string, textEditEl: Node) => void,
-    lastItem: boolean,
-};
-
-function TDLI(props: TDLIProps) {
-    const {
-        tdliId, tdliDone, tdliDesc,
-        handleTdliDoneChange, handleTdliDescInput,
-        lastItem,
-    } = props;
-
-    return (
-        <li className="todo-edit-list-item">
-            {!lastItem
-                ? (
-                    <MaterialIcon className="todo-edit-list-item-dragger md-dark"
-                                  icon="drag_indicator" />
-                )
-                : <div style={{width: '1rem', height: '1rem'}} />
-            }
-            <div className="todo-edit-list-item-checkbox">
-                <Checkbox fakeTdliId={tdliId}
-                          checked={tdliDone}
-                          handleChange={handleTdliDoneChange} />
-            </div>
-            <TextEdit id={tdliId}
-                      className="todo-edit-list-item-description"
-                      initText={tdliDesc}
-                      handleInput={handleTdliDescInput} />
-            {!lastItem
-                ? (
-                    <MaterialIcon className="todo-edit-list-item-deleter md-dark"
-                                  icon="cancel" />)
-                : <div style={{width: '1rem', height: '1rem'}} />
-            }
-        </li>
-    )
-}
 
 type TodoCreateNewProps = {
-    logger?: (msg: string) => void,
+    logger: (msg: string) => void,
     dbSync: () => Promise<string>,
     reset: () => void,
 };
@@ -65,44 +23,46 @@ type TodoCreateNewStates = {
 
 export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProps, TodoCreateNewStates> {
     tdTitle: string;
-    tdliValues: {};  // Structure: {tdliKeyX: {done: x, desc: x}, ...}
-    keysCount: number;
-    forceResetNoSave: boolean;  // See method resetSelf()
+    tdliData: {[key: string]: TDLIData};
+    fakeTdliIdsCount: number;
+    forceResetNoDataSave: boolean;  // See method resetNoDataSave()
 
     constructor(props: TodoCreateNewProps) {
         super(props);
         this.tdTitle = '';
-        this.tdliValues = {};
-        this.keysCount = 0;
-        this.forceResetNoSave = false;
+        this.tdliData = {};
+        this.fakeTdliIdsCount = 0;
+        this.forceResetNoDataSave = false;
 
-        const initialTdliId = this.getNewKey();
-        this.tdliValues[initialTdliId] = {
+        const firstTdliId = this.getNewKey();
+        this.tdliData[firstTdliId] = {
             done: false,
             desc: '',
         };
 
         this.state = {
             tdColor: '#EEEEEE',
-            tdliIds: [initialTdliId],
+            tdliIds: [firstTdliId],
         };
     }
+
+    /** ********** LIFECYCLE *********** **/
 
     async componentWillUnmount() {
         const {logger, dbSync} = this.props;
 
-        if (!this.forceResetNoSave) {
-            const resAddNewData = await this.saveTdToDB();
+        if (!this.forceResetNoDataSave) {
+            const res = await this.saveTdToDB();
             if (logger) {
-                if (resAddNewData instanceof Error) {
-                    logger(resAddNewData);
+                if (res instanceof Error) {
+                    logger(res);
                 } else {
-                    logger(resAddNewData.msg);
+                    logger(res.msg);
                 }
             }
 
-            if (Object.entries(resAddNewData.data).length !== 0
-                || resAddNewData instanceof Error) {
+            if (Object.entries(res.data).length !== 0
+                || res instanceof Error) {
                 const resDbSync = await dbSync();
                 if (logger) {
                     logger(resDbSync);
@@ -111,73 +71,11 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         }
     }
 
-    resetSelf = () => {
-        const {reset} = this.props;
+    /** ********** DATABASE *********** **/
 
-        this.forceResetNoSave = true;
-        reset();
-    };
-
-    getNewKey = (): string => {
-        const key = `key${this.keysCount}`;
-        this.keysCount += 1;
-        return key
-    };
-
-    isTdliLastItem = (tdliEl: Node) => {
-        if (tdliEl && tdliEl.parentNode) {
-            return tdliEl.parentNode.lastChild === tdliEl
-        }
-        return false
-    };
-
-    handleTdTitleInput = (tdId: string, newValue: string, textEditEl: Node) => {
-        this.tdTitle = newValue;
-    };
-
-    handleTdColorChange = (tdId: string, newValue: string) => {
-        this.setState({
-            tdColor: newValue,
-        });
-    };
-
-    handleTdliDoneChange = (tdliId: string, newValue: boolean) => {
-        this.tdliValues[tdliId].done = newValue;
-    };
-
-    handleTdliDescInput = (tdliId: string, newValue: string, textEditEl: Node) => {
-        this.tdliValues[tdliId].desc = newValue;
-
-        // Add new TDLI if applicable
-        const tdliEl = textEditEl.parentNode;
-        if (tdliEl && this.isTdliLastItem(tdliEl)) {
-            this.addNewTdli();
-        }
-    };
-
-    addNewTdli = () => {
-        const newtdliId = this.getNewKey();
-        this.tdliValues[newtdliId] = {
-            done: false,
-            desc: '',
-        };
-        this.setState(prevState => ({
-            tdliIds: [...prevState.tdliIds, newtdliId],
-        }));
-    };
-
-    checkEmptyTdTitle = () => this.tdTitle === '';
-
-    checkEmptyTdliValues = () => {
-        const {tdliIds} = this.state;
-        return tdliIds.every(tdliId => this.tdliValues[tdliId].desc === '');
-    };
-
-    checkNoChanges = () => {
-        const {tdliIds} = this.state;
-        return this.checkEmptyTdTitle() && tdliIds.length <= 1
-    };
-
+    /**
+     * Save all data in To-do Create New to database
+     * */
     saveTdToDB = async () => {
         try {
             if (this.checkNoChanges()) {
@@ -222,26 +120,26 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
                 title: this.tdTitle,
                 color: tdColor,
             };
-            const addedtdId = (await addTodo(tdToAdd)).data;
+            const addedTdId = (await addTodo(tdToAdd)).data;
 
             const tdlisToAdd = tdliIds.reduce((res, tdliId, index) => {
                 if (index < tdliIds.length - 1) {
                     const tdliToAdd = {
-                        todoId: addedtdId,
-                        done: this.tdliValues[tdliId].done,
-                        description: this.tdliValues[tdliId].desc,
+                        todoId: addedTdId,
+                        done: this.tdliData[tdliId].done,
+                        description: this.tdliData[tdliId].desc,
                     };
                     res.push(tdliToAdd);
                 }
                 return res
             }, []);
-            const addedtdliIds = (await addTodoListItem(tdlisToAdd)).data;
+            const addedTdliIds = (await addTodoListItem(tdlisToAdd)).data;
 
             return {
-                msg: `Added todo #${addedtdId} and todoListItems #[${addedtdliIds}]`,
+                msg: `Added todo #${addedTdId} and todoListItems #[${addedTdliIds}]`,
                 data: {
-                    tdId: addedtdId,
-                    tdliIds: addedtdliIds,
+                    tdId: addedTdId,
+                    tdliIds: addedTdliIds,
                 },
             }
         } catch (e) {
@@ -249,37 +147,131 @@ export default class TodoCreateNew extends React.PureComponent<TodoCreateNewProp
         }
     };
 
+    /** ********** FUNCTIONALITY *********** **/
+
+    handleTdTitleInput = (tdId: string, newValue: string, textEditEl: Node) => {
+
+    };
+
+    handleTdTitleBlur = (tdId: string, newValue: string, textEditEl: Node) => {
+        this.tdTitle = newValue;
+    };
+
+    handleTdColorChange = (tdId: string, newValue: string) => {
+        this.setState({
+            tdColor: newValue,
+        });
+    };
+
+    handleTdliDoneChange = (tdliId: string, newValue: boolean) => {
+        this.tdliData[tdliId].done = newValue;
+    };
+
+    handleTdliDescInput = (tdliId: string, newValue: string, textEditEl: Node) => {
+        // Add new TDLI if applicable
+        const tdliEl = textEditEl.parentNode;
+        if (tdliEl && this.isTdliLastItem(tdliEl)) {
+            this.addNewTdli();
+        }
+    };
+
+    handleTdliDescBlur = (tdliId: string, newValue: string, textEditEl: Node) => {
+        this.tdliData[tdliId].desc = newValue;
+    };
+
+    handleSelfBlur = (e: SyntheticFocusEvent<>) => {
+        e.stopPropagation();
+
+        const {reset} = this.props;
+
+        if (!e.relatedTarget || !elChildOfClass(e.relatedTarget, 'todo-create-new')) {
+            reset();
+        }
+    };
+
+    /** ********** MISC. *********** **/
+
+    resetNoDataSave = () => {
+        const {reset} = this.props;
+
+        this.forceResetNoDataSave = true;
+        reset();
+    };
+
+    getNewKey = (): string => {
+        const key = `key${this.fakeTdliIdsCount}`;
+        this.fakeTdliIdsCount += 1;
+        return key
+    };
+
+    addNewTdli = () => {
+        const newtdliId = this.getNewKey();
+        this.tdliData[newtdliId] = {
+            done: false,
+            desc: '',
+        };
+        this.setState(prevState => ({
+            tdliIds: [...prevState.tdliIds, newtdliId],
+        }));
+    };
+
+    isTdliLastItem = (tdliEl: Node) => {
+        if (tdliEl && tdliEl.parentNode) {
+            return tdliEl.parentNode.lastChild === tdliEl
+        }
+        return false
+    };
+
+    checkEmptyTdTitle = () => this.tdTitle === '';
+
+    checkEmptyTdliValues = () => {
+        const {tdliIds} = this.state;
+        return tdliIds.every(tdliId => this.tdliData[tdliId].desc === '');
+    };
+
+    /**
+     * Empty title and empty To-do List Item descriptions
+     * */
+    checkNoChanges = () => {
+        const {tdliIds} = this.state;
+        return this.checkEmptyTdTitle() && tdliIds.length <= 1
+    };
+
+    /** ********** RENDER *********** **/
+
     render() {
         const {tdliIds, tdColor} = this.state;
 
         const tdlis = tdliIds.map((tdliId, index) => {
-            const tdliDone = this.tdliValues[tdliId].done;
-            const tdliDesc = this.tdliValues[tdliId].desc;
-
-            console.log(`Rendering TDLI: tdliDesc = ${tdliDesc}`);
+            const tdliDone = this.tdliData[tdliId].done;
+            const tdliDesc = this.tdliData[tdliId].desc;
 
             return (
-                <TDLI key={tdliId}
-                      tdliId={tdliId}
-                      tdliDone={tdliDone}
-                      tdliDesc={tdliDesc}
-                      handleTdliDoneChange={this.handleTdliDoneChange}
-                      handleTdliDescInput={this.handleTdliDescInput}
-                      lastItem={index === tdliIds.length - 1} />
+                <TodoCreateNewTDLI key={tdliId}
+                                   tdliId={tdliId}
+                                   tdliDone={tdliDone}
+                                   tdliDesc={tdliDesc}
+                                   handleTdliDoneChange={this.handleTdliDoneChange}
+                                   handleTdliDescInput={this.handleTdliDescInput}
+                                   handleTdliDescBlur={this.handleTdliDescBlur}
+                                   lastItem={index === tdliIds.length - 1} />
             )
         });
 
         return (
             <div className="todo-create-new"
-                 style={{backgroundColor: tdColor}}>
+                 style={{backgroundColor: tdColor}}
+                 role="menuitem" tabIndex={0}
+                 onBlur={this.handleSelfBlur}>
                 <TextEdit className="todo-edit-title"
-                          id="tdcnTitle"
-                          handleInput={this.handleTdTitleInput} />
+                          id=""
+                          handleInput={this.handleTdTitleInput}
+                          handleBlur={this.handleTdTitleBlur} />
                 <ul className="todo-edit-list-items">
                     {tdlis}
                 </ul>
                 <OptionsPanel tdId=""
-                              removeTodo={this.resetSelf}
+                              removeTodo={this.resetNoDataSave}
                               changeColor={this.handleTdColorChange} />
             </div>
         )

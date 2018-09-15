@@ -170,9 +170,7 @@ export default class TodoBoard extends React.PureComponent<{}, TodoBoardStates> 
         ));
 
         return (
-            <div className="todo-board"
-                 onClick={this.handleBoardClick}
-                 role="presentation">
+            <div className="todo-board">
                 <section className="todo-board-top-control">
                     <div id="todo-board-logs">
                         {logMsgEls}

@@ -30,7 +30,12 @@ async function add(objStoreName, item, put = false, putKey = undefined) {
             let processedCount = 0;
 
             item.forEach((it, index) => {
-                const req = put ? objStore.put(it, sanitizeNumber(putKey[index])) : objStore.add(it);
+                let req;
+                if (put && putKey[index]) {
+                    req = objStore.put(it, sanitizeNumber(putKey[index]));
+                } else {
+                    req = objStore.add(it);
+                }
 
                 req.onerror = () => {
                     processedCount += 1;

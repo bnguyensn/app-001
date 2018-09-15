@@ -9,7 +9,7 @@ type TextEditProps = {
     placeholder?: string,
     initText?: string,
     handleInput: (id: string, newValue: string, textEditEL: Node) => void,
-    handleBlur?: (id: string, curValue: string, textEditEl: Node) => void,
+    handleBlur: (id: string, curValue: string, textEditEl: Node) => void,
 };
 
 export default class TextEdit extends React.PureComponent<TextEditProps, {}> {
@@ -25,13 +25,13 @@ export default class TextEdit extends React.PureComponent<TextEditProps, {}> {
     }
 
     componentDidUpdate(prevProps: TextEditProps, prevState: {}, snapshot: any) {
-        // this.updateInitText();
+        this.updateInitText();
     }
 
     updateInitText = () => {
         const {initText} = this.props;
         if (initText && this.el.current) {
-            this.el.current.textContent += initText;
+            this.el.current.textContent = initText;
         }
     };
 
@@ -40,7 +40,7 @@ export default class TextEdit extends React.PureComponent<TextEditProps, {}> {
         handleInput(id, e.currentTarget.textContent, e.currentTarget);
     };
 
-    handleBlur = (e: SyntheticInputEvent<HTMLDivElement>) => {
+    handleBlur = (e: SyntheticFocusEvent<HTMLDivElement>) => {
         const {id, handleBlur} = this.props;
         if (handleBlur) {
             handleBlur(id, e.currentTarget.textContent, e.currentTarget);
