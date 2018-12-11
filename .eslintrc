@@ -41,7 +41,7 @@
     "lines-between-class-members": 0,
     "max-len": [
       "error",
-      120
+      80
     ],
     "no-param-reassign": [
       "error",
