@@ -4,6 +4,9 @@
   "private": true,
   "dependencies": {
     "flow-bin": "^0.79.1",
+    "husky": "^1.2.0",
+    "lint-staged": "^8.1.0",
+    "prettier": "^1.15.3",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-scripts": "2.1.1"
@@ -17,6 +20,17 @@
     "eslint-plugin-react": "^7.10.0"
   },
   "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --single-quote --write",
+      "git add"
+    ]
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
