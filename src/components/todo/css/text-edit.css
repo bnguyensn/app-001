@@ -1,0 +1,12 @@
+.text-edit {
+  white-space: pre-wrap;
+  word-break: break-all;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.text-edit:empty:before {
+  content: attr(placeholder);
+  color: #9e9e9e;
+  cursor: text;
+}
