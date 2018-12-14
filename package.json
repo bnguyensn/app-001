@@ -8,6 +8,7 @@
     "flow-bin": "^0.79.1",
     "husky": "^1.2.0",
     "lint-staged": "^8.1.0",
+    "normalize.css": "^8.0.1",
     "prettier": "^1.15.3",
     "react": "^16.7.0-alpha.2",
     "react-dom": "^16.7.0-alpha.2",
