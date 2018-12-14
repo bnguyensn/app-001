@@ -1,16 +1,15 @@
+// @flow
+
 import * as React from 'react';
-import TodoBoard from './components/TodoBoard';
+import TodoBoard from './components/todo/TodoBoard';
 import './App.css';
 
-
-class App extends React.PureComponent {
-    render() {
-        return (
-            <div className="App">
-                <TodoBoard />
-            </div>
-        );
-    }
+function App() {
+  return (
+    <div className="App">
+      <TodoBoard />
+    </div>
+  );
 }
 
-export default App
+export default App;
