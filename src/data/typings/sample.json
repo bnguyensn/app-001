@@ -1,0 +1,20 @@
+[
+  {
+    "id": 0,
+    "text": "sample",
+    "posX": 50,
+    "posY": 100
+  },
+  {
+    "id": 1,
+    "text": "data",
+    "posX": 200,
+    "posY": 200
+  },
+  {
+    "id": 2,
+    "text": "very very long text 1234567890",
+    "posX": 50,
+    "posY": 150
+  }
+]
