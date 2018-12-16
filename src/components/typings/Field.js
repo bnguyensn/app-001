@@ -16,37 +16,38 @@ type FieldProps = {
   textBlocksData: TextBlockData[],
 };
 
-function updateField() {}
-
 function useTick() {
   let T = null;
 
-  // $FlowFixMe
   const [tick, setTick] = useState(1);
+  const [posY, setPosY] = useState(0);
 
-  // $FlowFixMe
-  // Start the timer
   useEffect(() => {
     T = window.setTimeout(() => {
+      // Update timer
       setTick(tick === 60 ? 1 : tick + 1);
-    }, 16.67);
+
+      // Update blocks
+      setPosY(posY + 1);
+    }, 41.67);
 
     return () => {
       window.clearInterval(T);
     };
   });
 
-  return [tick, T];
+  return [tick, posY, T];
 }
 
 function Field(props: FieldProps) {
   const { textBlocksData } = props;
 
-  const [tick, T] = useTick();
+  const [tick, posY, T] = useTick();
 
   return (
     <div className="field">
       Tick: {tick}
+      posY: {posY}
       <br />
       <br />
       {textBlocksData.map(textBlockData => (
