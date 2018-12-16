@@ -1,14 +1,13 @@
 // @flow
 
 import * as React from 'react';
-import Field from '../components/typings/Field';
+import Game from '../components/typings/Game';
 import './page.css';
-import sampleData from '../data/typings/sample';
 
 function TypingsPage() {
   return (
     <div className="page">
-      <Field textBlocksData={sampleData} />
+      <Game />
     </div>
   );
 }

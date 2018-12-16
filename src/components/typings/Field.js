@@ -1,7 +1,8 @@
 // @flow
 
 // $FlowFixMe
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { ConfigContext } from './Game';
 import TextBlock from './TextBlock';
 import './field.css';
 
@@ -17,6 +18,8 @@ type FieldProps = {
 };
 
 function useTick() {
+  const gameConfig = useContext(ConfigContext);
+
   let T = null;
 
   const [tick, setTick] = useState(1);
@@ -50,14 +53,7 @@ function Field(props: FieldProps) {
       posY: {posY}
       <br />
       <br />
-      {textBlocksData.map(textBlockData => (
-        <TextBlock
-          key={textBlockData.id}
-          text={textBlockData.text}
-          posX={textBlockData.posX}
-          posY={textBlockData.posY}
-        />
-      ))}
+      <TextBlock text="understandings" posX={50} posY={posY} />
     </div>
   );
 }

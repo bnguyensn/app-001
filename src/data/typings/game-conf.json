@@ -1,0 +1,7 @@
+{
+  "fps": 24,
+  "blockSpeed": 420,
+  "newBlockInterval": 24,
+  "maxBlock": 10,
+  "minBlock": 0
+}
