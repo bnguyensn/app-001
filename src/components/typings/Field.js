@@ -1,7 +1,6 @@
 // @flow
 
-// $FlowFixMe
-import React, { useEffect, useState, useContext } from 'react';
+import * as React from 'react';
 import { ConfigContext } from './Game';
 import TextBlock from './TextBlock';
 import './field.css';
@@ -15,47 +14,11 @@ type TextBlockData = {
 
 type FieldProps = {
   textBlocksData: TextBlockData[],
+  children?: React.Node,
 };
 
-function useTick() {
-  const gameConfig = useContext(ConfigContext);
+export default function Field(props: FieldProps) {
+  const { textBlocksData, children } = props;
 
-  let T = null;
-
-  const [tick, setTick] = useState(1);
-  const [posY, setPosY] = useState(0);
-
-  useEffect(() => {
-    T = window.setTimeout(() => {
-      // Update timer
-      setTick(tick === 60 ? 1 : tick + 1);
-
-      // Update blocks
-      setPosY(posY + 1);
-    }, 41.67);
-
-    return () => {
-      window.clearInterval(T);
-    };
-  });
-
-  return [tick, posY, T];
+  return <div className="field">{children}</div>;
 }
-
-function Field(props: FieldProps) {
-  const { textBlocksData } = props;
-
-  const [tick, posY, T] = useTick();
-
-  return (
-    <div className="field">
-      Tick: {tick}
-      posY: {posY}
-      <br />
-      <br />
-      <TextBlock text="understandings" posX={50} posY={posY} />
-    </div>
-  );
-}
-
-export default Field;

@@ -1,0 +1,9 @@
+.button {
+  border: none;
+  padding: 0.25rem 0.5rem;
+
+  border-radius: 5px;
+  background-color: #f48fb1; /* Pink 200 */
+
+  cursor: pointer;
+}
