@@ -1,6 +1,6 @@
 {
-  "fps": 24,
-  "blockSpeed": 420,
+  "fps": 41.67,
+  "blockTravelDist": 420,
   "newBlockInterval": 24,
   "maxBlock": 10,
   "minBlock": 0
