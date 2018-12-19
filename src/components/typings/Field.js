@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { ConfigContext } from './Game';
-import TextBlock from './TextBlock';
+import TextBlock from './Blocks';
 import './field.css';
 
 type TextBlockData = {
