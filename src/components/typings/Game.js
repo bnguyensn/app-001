@@ -21,18 +21,16 @@ export type BlockType = {
 };
 
 export default function Game() {
+  const [playing, setPlaying] = useState(true);
+  const handlePlayButtonClick = () => {
+    setPlaying(!playing);
+  };
+
   const [tick, setTick] = useState(1);
   const [throttling, setThrottling] = useState(false);
-
-  const [textBlocks, setTextBlocks] = useState(sampleData);
-  const [inputBlock, setInputBlock] = useState('');
-
-  const [playing, setPlaying] = useState(true);
-
   const updateTick = () => {
     setTick(tick === gameConfig.fps ? 1 : tick + 1);
   };
-
   const updateThrottling = () => {
     setThrottling(true);
     setTimeout(() => {
@@ -40,22 +38,11 @@ export default function Game() {
     }, gameConfig.tickRate);
   };
 
+  const [textBlocks, setTextBlocks] = useState(sampleData);
   const moveBlocksDown = () => {
     setTextBlocks(
       textBlocks.map(block => ({ ...block, posY: block.posY + 1 })),
     );
-  };
-
-  const updateInputBox = (e: SyntheticKeyboardEvent<HTMLElement>) => {
-    if (e.key === 'Backspace' || e.key === 'Enter') {
-      setInputBlock('');
-    } else if (e.key.length === 1 && TEXT_REGEX.test(e.key)) {
-      setInputBlock(inputBlock + e.key.toLowerCase());
-    }
-  };
-
-  const handlePlayButtonClick = () => {
-    setPlaying(!playing);
   };
 
   useEffect(() => {
@@ -66,13 +53,21 @@ export default function Game() {
     }
   });
 
+  const [inputText, setInputText] = useState('');
+  const updateInputText = (e: SyntheticKeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Backspace' || e.key === 'Enter') {
+      setInputText('');
+    } else if (e.key.length === 1 && TEXT_REGEX.test(e.key)) {
+      setInputText(inputText + e.key.toLowerCase());
+    }
+  };
   useEffect(() => {
     if (playing) {
-      window.addEventListener('keypress', updateInputBox);
+      window.addEventListener('keypress', updateInputText);
     }
 
     return () => {
-      window.removeEventListener('keypress', updateInputBox);
+      window.removeEventListener('keypress', updateInputText);
     };
   });
 
@@ -98,7 +93,7 @@ export default function Game() {
               posY={block.posY}
             />
           ))}
-          <InputBlock text={inputBlock} />
+          <InputBlock text={inputText} />
         </Field>
       </div>
     </ConfigContext.Provider>
