@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "airbnb",
-    "plugin:flowtype/recommended"
-  ],
+  "extends": ["airbnb", "plugin:flowtype/recommended", "prettier"],
   "parser": "babel-eslint",
   "env": {
     "browser": true,
@@ -11,42 +8,25 @@
     "es6": true,
     "mongo": true
   },
-  "plugins": [
-    "flowtype",
-    "jsx-a11y"
-  ],
+  "plugins": ["flowtype", "jsx-a11y"],
   "globals": {
     //        "VERSION": true,
     //        "$PropertyType": true
   },
   "rules": {
-    "arrow-body-style": [
-      "warn",
-      "as-needed"
-    ],
-    "arrow-parens": [
-      "error",
-      "as-needed"
-    ],
-    "block-spacing": [
-      "error",
-      "never"
-    ],
+    "arrow-body-style": ["warn", "as-needed"],
+    "arrow-parens": ["error", "as-needed"],
+    "block-spacing": ["error", "never"],
     "indent": "off",
     "jsx-a11y/anchor-is-valid": [
       "error",
       {
-        "aspects": [
-          "invalidHref"
-        ]
+        "aspects": ["invalidHref"]
       }
     ],
     "linebreak-style": 0,
     "lines-between-class-members": 0,
-    "max-len": [
-      "error",
-      80
-    ],
+    "max-len": ["error", 80],
     "no-param-reassign": [
       "error",
       {
@@ -58,10 +38,7 @@
     "no-console": [
       "error",
       {
-        "allow": [
-          "log",
-          "error"
-        ]
+        "allow": ["log", "error"]
       }
     ],
     "no-multi-spaces": [
@@ -90,10 +67,7 @@
       }
     ],
     "react/jsx-filename-extension": 0,
-    "react/jsx-indent": [
-      true,
-      4
-    ],
+    "react/jsx-indent": [true, 4],
     "react/no-multi-comp": 0,
     "react/jsx-closing-bracket-location": false,
     "react/jsx-first-prop-new-line": false,
