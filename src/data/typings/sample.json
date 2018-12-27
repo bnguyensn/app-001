@@ -1,12 +1,12 @@
 [
-  { "id": 0, "text": "facings", "posX": 0, "posY": 0 },
-  { "id": 1, "text": "manages", "posX": 0, "posY": 0 },
-  { "id": 2, "text": "nods", "posX": 0, "posY": 0 },
-  { "id": 3, "text": "entire", "posX": 0, "posY": 0 },
-  { "id": 4, "text": "points", "posX": 0, "posY": 0 },
-  { "id": 5, "text": "thicks", "posX": 0, "posY": 0 },
-  { "id": 6, "text": "settling", "posX": 0, "posY": 0 },
-  { "id": 7, "text": "image", "posX": 0, "posY": 0 },
-  { "id": 8, "text": "things", "posX": 0, "posY": 0 },
-  { "id": 9, "text": "ignored", "posX": 0, "posY": 0 }
+  { "id": 0, "text": "rained", "posX": 0.43, "posY": 57 },
+  { "id": 1, "text": "paints", "posX": 0.1, "posY": 19 },
+  { "id": 2, "text": "yelling", "posX": 0.54, "posY": 0 },
+  { "id": 3, "text": "leg", "posX": 0.71, "posY": 92 },
+  { "id": 4, "text": "funnies", "posX": 0.4, "posY": 27 },
+  { "id": 5, "text": "stronger", "posX": 0.89, "posY": 22 },
+  { "id": 6, "text": "pause", "posX": 0.75, "posY": 44 },
+  { "id": 7, "text": "days", "posX": 0.9, "posY": 91 },
+  { "id": 8, "text": "build", "posX": 0.57, "posY": 38 },
+  { "id": 9, "text": "grouped", "posX": 0.71, "posY": 32 }
 ]

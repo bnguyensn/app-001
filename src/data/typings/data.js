@@ -7,6 +7,10 @@
 const path = require('path');
 const fs = require('fs');
 
+function randIntBtw(max, min) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 /**
  * Split a string of words using a delimiter
  * */
@@ -47,8 +51,8 @@ function generateSampleData() {
       d.push({
         id: i,
         text: words[n],
-        posX: 0,
-        posY: 0,
+        posX: randIntBtw(90, 10) / 100,
+        posY: randIntBtw(100, 0),
       });
     }
 
