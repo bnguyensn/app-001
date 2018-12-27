@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { ConfigContext } from './Game';
-import TextBlock from './Blocks';
 import './field.css';
 
 type TextBlockData = {
@@ -20,5 +19,9 @@ type FieldProps = {
 export default function Field(props: FieldProps) {
   const { textBlocksData, children } = props;
 
-  return <div className="field">{children}</div>;
+  return (
+    <div id="field" className="field">
+      {children}
+    </div>
+  );
 }

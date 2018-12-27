@@ -1,7 +1,7 @@
 // @flow
 
 // $FlowFixMe
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Field from './Field';
 import { PlayButton } from './Button';
 import gameConfig from '../../data/typings/game-conf';
@@ -13,14 +13,9 @@ export const ConfigContext = React.createContext(gameConfig);
 
 const TEXT_REGEX = /[a-z]/i;
 
-export type BlockType = {
-  id: number,
-  text: string,
-  posX: number,
-  posY: number,
-};
-
 export default function Game() {
+  /** ********** AUTOMATIC BACKGROUND PROGRESS ********** **/
+
   const [playing, setPlaying] = useState(true);
   const handlePlayButtonClick = () => {
     setPlaying(!playing);
@@ -38,10 +33,39 @@ export default function Game() {
     }, gameConfig.tickRate);
   };
 
-  const [textBlocks, setTextBlocks] = useState(sampleData);
+  const [texts, setTexts] = useState(
+    sampleData.map(d => ({
+      id: d.id,
+      text: d.text,
+    })),
+  );
+
+  const [fieldWidth, setFieldWidth] = useState(0);
+  useLayoutEffect(
+    () => {
+      const fieldRect = document.getElementById('field');
+      if (fieldRect) {
+        setFieldWidth(fieldRect.getBoundingClientRect().width);
+      }
+    },
+    [window.innerWidth],
+  );
+
+  const [textPos, setTextPos] = useState(
+    sampleData.map(d => {
+      return {
+        id: d.id,
+        posX: d.posX,
+        posY: d.posY,
+      };
+    }),
+  );
   const moveBlocksDown = () => {
-    setTextBlocks(
-      textBlocks.map(block => ({ ...block, posY: block.posY + 1 })),
+    setTextPos(
+      textPos.map(pos => ({
+        ...pos,
+        posY: pos.posY + 1,
+      })),
     );
   };
 
@@ -53,14 +77,31 @@ export default function Game() {
     }
   });
 
+  /** ********** USER INTERACTIONS ********** **/
+
   const [inputText, setInputText] = useState('');
+  const [matchedTexts, setMatchedTexts] = useState(
+    sampleData.map(d => ({ id: d.id, text: '' })),
+  );
+
   const updateInputText = (e: SyntheticKeyboardEvent<HTMLElement>) => {
-    if (e.key === 'Backspace' || e.key === 'Enter') {
+    if (e.key === 'Enter') {
+      // Reset game states
       setInputText('');
+      setMatchedTexts(sampleData.map(d => ({ id: d.id, text: '' })));
     } else if (e.key.length === 1 && TEXT_REGEX.test(e.key)) {
-      setInputText(inputText + e.key.toLowerCase());
+      const newInputText = inputText + e.key.toLowerCase();
+      setInputText(newInputText);
+      setMatchedTexts(
+        matchedTexts.map((matchedText, i) =>
+          newInputText === texts[i].text.slice(0, newInputText.length)
+            ? { id: matchedText.id, text: newInputText }
+            : { id: matchedText.id, text: '' },
+        ),
+      );
     }
   };
+
   useEffect(() => {
     if (playing) {
       window.addEventListener('keypress', updateInputText);
@@ -70,6 +111,8 @@ export default function Game() {
       window.removeEventListener('keypress', updateInputText);
     };
   });
+
+  /** ********** RENDER ********** **/
 
   return (
     <ConfigContext.Provider value={gameConfig}>
@@ -85,12 +128,17 @@ export default function Game() {
             }}
           />
           {tick}fps
-          {textBlocks.map(block => (
+          {texts.map((text, i) => (
             <TextBlock
-              key={block.id}
-              text={block.text}
-              posX={block.posX}
-              posY={block.posY}
+              key={text.id}
+              text={text.text}
+              textMatched={matchedTexts[i].text}
+              textUnmatched={text.text.slice(
+                matchedTexts[i].text.length,
+                text.text.length,
+              )}
+              posX={textPos[i].posX * fieldWidth}
+              posY={textPos[i].posY}
             />
           ))}
           <InputBlock text={inputText} />

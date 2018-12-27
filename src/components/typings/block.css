@@ -1,7 +1,7 @@
 .text-block {
   position: absolute;
 
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 
@@ -12,6 +12,10 @@
   opacity: 0.8;
 
   color: #fafafa;
+}
+
+.text-block .matched {
+  color: #a5d6a7; /* Green 200 */
 }
 
 .input-block {

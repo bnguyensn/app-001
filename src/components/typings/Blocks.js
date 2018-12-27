@@ -5,16 +5,22 @@ import './block.css';
 
 type TextBlockProps = {
   text: string,
+  textMatched: string,
+  textUnmatched: string,
   posX: number,
   posY: number,
 };
 
 function TextBlock(props: TextBlockProps) {
-  const { text, posX, posY } = props;
+  const { text, textMatched, textUnmatched, posX, posY } = props;
 
   return (
-    <div className="text-block" style={{ top: posY, left: posX }}>
-      {text}
+    <div
+      className="text-block"
+      style={{ transform: `translate(${posX}px, ${posY}px` }}
+    >
+      <span className="matched">{textMatched}</span>
+      {textUnmatched}
     </div>
   );
 }
