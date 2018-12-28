@@ -2,9 +2,9 @@
 
 // $FlowFixMe
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import Field from './Field';
-import { PlayButton } from './Button';
-import { InputBlock, TextBlock } from './Blocks';
+import Field from './components/Field';
+import { PlayButton } from './components/Button';
+import { InputBlock, TextBlock } from './components/Blocks';
 import gameConfig from '../../data/typings/game-conf';
 import sampleData from '../../data/typings/sample';
 import wordsData from '../../data/typings/words-1';

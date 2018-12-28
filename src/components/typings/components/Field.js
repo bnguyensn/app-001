@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { ConfigContext } from './Game';
+import { ConfigContext } from '../Game';
 import './field.css';
 
 type TextBlockData = {
