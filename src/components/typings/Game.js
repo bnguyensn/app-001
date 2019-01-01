@@ -9,6 +9,7 @@ import gameConfig from '../../data/typings/game-conf';
 import sampleData from '../../data/typings/sample';
 import wordsData from '../../data/typings/words-1';
 import './game.css';
+import Panel from './components/Panel';
 
 export const ConfigContext = React.createContext(gameConfig);
 
@@ -190,19 +191,9 @@ export default function Game() {
   return (
     <ConfigContext.Provider value={gameConfig}>
       <div className="game">
+        <Panel score={score} fps={tick} wpm={0} />
+        <PlayButton action={handlePlayButtonClick} playing={playing} />
         <Field tick={tick} textBlocksData={sampleData}>
-          <PlayButton
-            action={handlePlayButtonClick}
-            playing={playing}
-            style={{
-              position: 'absolute',
-              top: '5px',
-              right: '5px',
-            }}
-          />
-          {tick}fps
-          <br />
-          Score: {score}
           {texts.map((text, i) => (
             <TextBlock
               key={text.id}
@@ -216,8 +207,8 @@ export default function Game() {
               posY={textPos[i].posY}
             />
           ))}
-          <InputBlock text={inputText} />
         </Field>
+        <InputBlock text={inputText} />
       </div>
     </ConfigContext.Provider>
   );

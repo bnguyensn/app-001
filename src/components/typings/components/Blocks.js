@@ -32,7 +32,11 @@ type InputBlockProps = {
 function InputBlock(props: InputBlockProps) {
   const { text } = props;
 
-  return <div className="input-block">{text}</div>;
+  return (
+    <div className="input-block-wrapper">
+      <div className="input-block">{text}</div>
+    </div>
+  );
 }
 
 export { TextBlock, InputBlock };

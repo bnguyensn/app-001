@@ -18,11 +18,20 @@
   color: #a5d6a7; /* Green 200 */
 }
 
-.input-block {
-  position: absolute;
-  bottom: 5px;
-  left: 5%;
+.text-block {
+  user-select: none;
+}
 
+.input-block-wrapper {
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+
+  padding: 0.5rem;
+}
+
+.input-block {
   display: flex;
   align-items: center;
   justify-content: center;

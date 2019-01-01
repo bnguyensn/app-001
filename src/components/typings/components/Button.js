@@ -20,7 +20,16 @@ export function PlayButton(props: { action: any => any, playing: boolean }) {
   const { action, playing, ...rest } = props;
 
   return (
-    <Button action={action} {...rest}>
+    <Button
+      action={action}
+      style={{
+        position: 'absolute',
+        top: '5px',
+        right: '5px',
+        tabIndex: -1,
+      }}
+      {...rest}
+    >
       {playing ? 'Pause' : 'Play'}
     </Button>
   );
