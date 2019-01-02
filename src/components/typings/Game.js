@@ -3,13 +3,14 @@
 // $FlowFixMe
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Field from './components/Field';
+import Panel from './components/Panel';
 import { PlayButton } from './components/Button';
 import { InputBlock, TextBlock } from './components/Blocks';
+import randIntBtw from '../../utils/randIntBtw';
 import gameConfig from '../../data/typings/game-conf';
 import sampleData from '../../data/typings/sample';
 import wordsData from '../../data/typings/words-1';
 import './game.css';
-import Panel from './components/Panel';
 
 export const ConfigContext = React.createContext(gameConfig);
 
@@ -152,7 +153,8 @@ export default function Game() {
                 // Reset posY of the scored text
                 setTextPos(
                   textPos.map((tPos, tPosIndex) => ({
-                    ...tPos,
+                    posX:
+                      tPosIndex === i ? randIntBtw(90, 10) / 100 : tPos.posX,
                     posY: tPosIndex === i ? 0 : tPos.posY,
                   })),
                 );
