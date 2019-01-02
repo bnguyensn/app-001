@@ -25,7 +25,7 @@ export default function Game() {
   /** ***** Runner ***** **/
 
   const [playing, setPlaying] = useState(true);
-  const handlePlayButtonClick = () => {
+  const playOrPauseGame = () => {
     setPlaying(!playing);
   };
 
@@ -104,6 +104,9 @@ export default function Game() {
   /* LOGIC
   1. User keyboard input when game is NOT paused
 
+  -- Case 'Escape' key
+  2. Play / Pause game
+
   -- Case 'Enter' key
   2. Reset textInput and all highlights
 
@@ -117,72 +120,74 @@ export default function Game() {
    */
 
   const updateInputText = (e: SyntheticKeyboardEvent<HTMLElement>) => {
-    if (e.key === 'Enter') {
-      // Reset
-      setInputText('');
-      setTexts(
-        texts.map(text => ({
-          ...text,
-          matchedText: '',
-        })),
-      );
-    } else if (e.key.length === 1 && TEXT_REGEX.test(e.key)) {
-      const newInputText = inputText + e.key.toLowerCase();
+    if (e.key === 'Escape') {
+      playOrPauseGame();
+    } else if (playing) {
+      if (e.key === 'Enter') {
+        // Reset
+        setInputText('');
+        setTexts(
+          texts.map(text => ({
+            ...text,
+            matchedText: '',
+          })),
+        );
+      } else if (e.key.length === 1 && TEXT_REGEX.test(e.key)) {
+        const newInputText = inputText + e.key.toLowerCase();
 
-      // Update input bar
-      setInputText(newInputText);
+        // Update input bar
+        setInputText(newInputText);
 
-      // Update text boxes
-      setTexts(
-        texts.map((text, i) => {
-          if (newInputText === text.text.slice(0, newInputText.length)) {
-            if (newInputText.length === text.text.length) {
-              // A score!
-              setScore(score + text.text.length);
+        // Update text boxes
+        setTexts(
+          texts.map((text, i) => {
+            if (newInputText === text.text.slice(0, newInputText.length)) {
+              if (newInputText.length === text.text.length) {
+                // A score!
+                setScore(score + text.text.length);
 
-              // Reset inputText
-              setInputText('');
+                // Reset inputText
+                setInputText('');
 
-              // Reset posY of the scored text
-              setTextPos(
-                textPos.map((tPos, tPosIndex) => ({
-                  ...tPos,
-                  posY: tPosIndex === i ? 0 : tPos.posY,
-                })),
-              );
+                // Reset posY of the scored text
+                setTextPos(
+                  textPos.map((tPos, tPosIndex) => ({
+                    ...tPos,
+                    posY: tPosIndex === i ? 0 : tPos.posY,
+                  })),
+                );
 
-              // Replace scored text with new text
-              return {
-                id: i,
-                text: getNewText(),
-                matchedText: '',
-              };
+                // Replace scored text with new text
+                return {
+                  id: i,
+                  text: getNewText(),
+                  matchedText: '',
+                };
+              } else {
+                // Highlight text boxes
+                return {
+                  ...text,
+                  matchedText: newInputText,
+                };
+              }
             } else {
-              // Highlight text boxes
+              // Reset
               return {
                 ...text,
-                matchedText: newInputText,
+                matchedText: '',
               };
             }
-          } else {
-            // Reset
-            return {
-              ...text,
-              matchedText: '',
-            };
-          }
-        }),
-      );
+          }),
+        );
+      }
     }
   };
 
   useEffect(() => {
-    if (playing) {
-      window.addEventListener('keypress', updateInputText);
-    }
+    window.addEventListener('keydown', updateInputText);
 
     return () => {
-      window.removeEventListener('keypress', updateInputText);
+      window.removeEventListener('keydown', updateInputText);
     };
   });
 
@@ -192,7 +197,7 @@ export default function Game() {
     <ConfigContext.Provider value={gameConfig}>
       <div className="game">
         <Panel score={score} fps={tick} wpm={0} />
-        <PlayButton action={handlePlayButtonClick} playing={playing} />
+        <PlayButton action={playOrPauseGame} playing={playing} />
         <Field tick={tick} textBlocksData={sampleData}>
           {texts.map((text, i) => (
             <TextBlock
