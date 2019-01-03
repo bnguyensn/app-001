@@ -45,33 +45,70 @@ export default function Game() {
   /** ***** Layout ***** **/
 
   const [fieldWidth, setFieldWidth] = useState(0);
+  const [fieldHeight, setFieldHeight] = useState(0);
   useLayoutEffect(
     () => {
       const fieldRect = document.getElementById('field');
       if (fieldRect) {
         setFieldWidth(fieldRect.getBoundingClientRect().width);
+        setFieldHeight(fieldRect.getBoundingClientRect().height);
       }
     },
     [window.innerWidth],
   );
 
+  const [texts, setTexts] = useState(
+    sampleData.map(d => ({
+      id: d.id,
+      text: d.text,
+      matchedText: '',
+    })),
+  );
+
   const [textPos, setTextPos] = useState(
-    sampleData.map(d => {
-      return {
-        id: d.id,
-        posX: d.posX,
-        posY: d.posY,
-      };
-    }),
+    sampleData.map(d => ({
+      id: d.id,
+      posX: d.posX,
+      posY: d.posY,
+    })),
   );
 
   const moveBlocksDown = () => {
+    // Create an array to hold potential new texts (which happen when a text
+    // reaches the end without being cleared
+    const newTexts = [];
+
+    // Update text positions
     setTextPos(
-      textPos.map(pos => ({
-        ...pos,
-        posY: pos.posY + 1,
-      })),
+      textPos.map((pos, i) => {
+        if (pos.posY >= fieldHeight) {
+          newTexts.push(i);
+          return {
+            ...pos,
+            posY: 0,
+          };
+        }
+        return { ...pos, posY: pos.posY + 1 };
+      }),
     );
+
+    // Create new texts if applicable
+    if (newTexts.length > 0) {
+      setTexts(
+        texts.map((text, i) => {
+          if (newTexts.includes(i)) {
+            return {
+              id: text.id,
+              text: getNewText(),
+              matchedText: '',
+            };
+          }
+          return {
+            ...text,
+          };
+        }),
+      );
+    }
   };
 
   /** ***** Run logic ***** **/
@@ -89,14 +126,6 @@ export default function Game() {
   const [score, setScore] = useState(0);
 
   /** ********** USER INTERACTIONS ********** **/
-
-  const [texts, setTexts] = useState(
-    sampleData.map(d => ({
-      id: d.id,
-      text: d.text,
-      matchedText: '',
-    })),
-  );
 
   const [inputText, setInputText] = useState('');
 
