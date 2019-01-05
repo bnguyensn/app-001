@@ -14,7 +14,7 @@ import './game.css';
 
 export const ConfigContext = React.createContext(gameConfig);
 
-const TEXT_REGEX = /[a-z]/i;
+const TEXT_REGEX = /[a-z']/i;
 
 function getNewText(): string {
   return wordsData[Math.floor(Math.random() * wordsData.length)];
@@ -42,10 +42,14 @@ export default function Game() {
     }, gameConfig.tickRate);
   };
 
+  /** ********** KEEPING SCORES ********** **/
+
+  const [score, setScore] = useState(0);
+
   /** ***** Layout ***** **/
 
-  const [fieldWidth, setFieldWidth] = useState(0);
-  const [fieldHeight, setFieldHeight] = useState(0);
+  const [fieldWidth, setFieldWidth] = useState();
+  const [fieldHeight, setFieldHeight] = useState();
   useLayoutEffect(
     () => {
       const fieldRect = document.getElementById('field');
@@ -93,7 +97,15 @@ export default function Game() {
     );
 
     // Create new texts if applicable
+    // Also update score
     if (newTexts.length > 0) {
+      const penalty = newTexts.reduce(
+        (acc, cur) => acc + texts[cur].text.length,
+        0,
+      );
+
+      setScore(score - penalty);
+
       setTexts(
         texts.map((text, i) => {
           if (newTexts.includes(i)) {
@@ -120,10 +132,6 @@ export default function Game() {
       updateThrottling();
     }
   });
-
-  /** ********** KEEPING SCORES ********** **/
-
-  const [score, setScore] = useState(0);
 
   /** ********** USER INTERACTIONS ********** **/
 
