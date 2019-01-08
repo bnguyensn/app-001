@@ -1,10 +1,12 @@
 // @flow
 
 /**
- * This reducer manages the complete state of our app.
+ * Manage the complete state of our app.
  * */
 
 import type { ActionType } from '../actions/main';
+import { NEXT_TICK } from '../actions/main';
+import { tick, throttle } from './tick';
 
 /** ********** TYPES ********** **/
 
@@ -28,6 +30,8 @@ export type StateType = {
 
 /** ********** INITIAL STATE ********** **/
 
+const INITIAL_TEXTS_BY_ID = {};
+
 const INITIAL_STATE = {
   playing: true,
   tick: 1,
@@ -38,9 +42,19 @@ const INITIAL_STATE = {
   texts: [],
 };
 
-/** ********** MAIN REDUCER ********** **/
+/** ********** REDUCER ********** **/
 
 export default function app(
   state: StateType = INITIAL_STATE,
   action: ActionType,
-) {}
+): StateType {
+  switch (action.type) {
+    case NEXT_TICK:
+      return {
+        ...state,
+        tick: tick(state.tick, action),
+      };
+    default:
+      return state;
+  }
+}
