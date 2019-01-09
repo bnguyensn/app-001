@@ -5,7 +5,7 @@
  * */
 
 import type { ActionType } from '../actions/main';
-import { NEXT_TICK } from '../actions/main';
+import { NEXT_TICK, TOGGLE_THROTTLING } from '../actions/main';
 import { tick, throttle } from './tick';
 
 /** ********** TYPES ********** **/
@@ -53,6 +53,11 @@ export default function app(
       return {
         ...state,
         tick: tick(state.tick, action),
+      };
+    case TOGGLE_THROTTLING:
+      return {
+        ...state,
+        throttling: throttle(state.throttling, action),
       };
     default:
       return state;
