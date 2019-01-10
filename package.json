@@ -12,8 +12,10 @@
     "prettier": "^1.15.3",
     "react": "16.8.0-alpha.0",
     "react-dom": "16.8.0-alpha.0",
+    "react-redux": "^6.0.0",
     "react-relay": "^1.7.0",
     "react-scripts": "2.1.1",
+    "redux": "^4.0.1",
     "source-map-explorer": "^1.6.0"
   },
   "devDependencies": {
