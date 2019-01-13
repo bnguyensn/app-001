@@ -1,0 +1,21 @@
+.material-icons-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.material-icons-container.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.material-icons-container.md-dark:hover {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.material-icons-container.md-dark.md-inactive {
+  color: rgba(0, 0, 0, 0.13);
+}
+
+.material-icons {
+  font-size: inherit;
+}

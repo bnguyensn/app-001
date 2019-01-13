@@ -1,38 +1,40 @@
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 body {
-    min-width: 320px;
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
+  min-width: 320px;
+  margin: 0;
+  padding: 0;
+
+  font-family: sans-serif;
+  color: #212121;
 }
 
 @media only screen and (max-width: 640px) {
-    html {
-        font-size: 16px;
-    }
+  html {
+    font-size: 16px;
+  }
 }
 
 @media only screen and (min-width: 640px) {
-    html {
-        font-size: 20px;
-    }
+  html {
+    font-size: 20px;
+  }
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 .hidden-vis {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .hidden-op {
-    opacity: 0;
+  opacity: 0;
 }

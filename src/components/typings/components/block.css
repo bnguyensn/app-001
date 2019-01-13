@@ -1,0 +1,50 @@
+.text-block {
+  position: absolute;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.25rem 0.5rem;
+
+  border-radius: 5px;
+  background-color: #f48fb1; /* Pink 200 */
+  opacity: 0.8;
+
+  color: #fafafa;
+}
+
+.text-block .matched {
+  color: #a5d6a7; /* Green 200 */
+}
+
+.text-block {
+  user-select: none;
+}
+
+.input-block-wrapper {
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+
+  padding: 0.5rem;
+}
+
+.input-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+
+  padding: 0.5rem 1rem;
+
+  border-radius: 5px;
+  background-color: #fafafa;
+
+  color: #212121;
+}
+
+.input-block:empty::before {
+  content: '\00a0';
+}

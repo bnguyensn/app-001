@@ -1,0 +1,8 @@
+{
+  "fps": 25,
+  "tickRate": 40,
+  "blockTravelFrames": 250,
+  "newBlockFrames": 25,
+  "maxBlock": 10,
+  "minBlock": 0
+}
