@@ -1,14 +1,33 @@
 // @flow
 
-import type { TickStateType, TickActionType } from '../reducers/tick';
-import gameConf from '../../../data/typings/game-conf';
+/**
+ * Contain action creators that manage ticks.
+ * */
 
-export default function nextTick(state: TickStateType): TickActionType {
+import { NEXT_TICK, TOGGLE_THROTTLING } from './main';
+
+/** ********** NEXT_TICK ********** **/
+
+export type NextTickActionType = {
+  type: string,
+  payload: number,
+};
+
+export function nextTick(amount?: number = 1): NextTickActionType {
   return {
-    type: 'NEXT_TICK',
-    payload: {
-      tick: state.tick === gameConf.fps ? 1 : state.tick + 1,
-      throttling: true,
-    },
+    type: NEXT_TICK,
+    payload: amount,
+  };
+}
+
+/** ********** TOGGLE_THROTTLING ********** **/
+
+export type ToggleThrottlingActionType = {
+  type: string,
+};
+
+export function toggleThrottling(): ToggleThrottlingActionType {
+  return {
+    type: TOGGLE_THROTTLING,
   };
 }
